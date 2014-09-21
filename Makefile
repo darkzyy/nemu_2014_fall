@@ -48,7 +48,7 @@ test: nemu $(TEST_FILE_LIST)
 
 
 STU_ID=131220070
-SHARED_FOLDER=~/Templates
+SHARED_FOLDER=~/share
 
 submit: clean
 	cd testcase && make clean
