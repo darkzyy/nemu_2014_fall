@@ -127,7 +127,20 @@ void main_loop() {
 			}
 			else cmd_si(1);
 	   	}
-		else if(strcmp(p,"infor") == 0) { cmd_info_reg(); }
+		else if(strcmp(p,"info") == 0) {
+			p = strtok(NULL," ");
+			if(p ==NULL){ 
+				printf("Unknown command");
+			}
+			else {
+				char a=0;
+				sscanf(p,"%c",&a);
+				if(a=='r'){
+					cmd_info_reg();
+				}
+				else printf("Unknown command");
+			}
+	   	}
 
 		/* TODO: Add more commands */
 
