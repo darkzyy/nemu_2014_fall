@@ -65,7 +65,8 @@ static void cmd_r() {
 		char c;
 		while(1) {
 			printf("The program is already running. Restart the program? (y or n)");
-			scanf("%c", &c);
+			fflush(stdout);
+			scanf(" %c", &c);
 			switch(c) {
 				case 'y': goto restart_;
 				case 'n': return;
@@ -130,18 +131,44 @@ void main_loop() {
 		else if(strcmp(p,"info") == 0) {
 			p = strtok(NULL," ");
 			if(p ==NULL){ 
-				printf("Unknown command");
+				printf("Unknown command 'info %s'\n",p);
 			}
 			else {
-				char a=0;
-				sscanf(p,"%c",&a);
-				if(a=='r'){
+				if(strcmp(p,"r")==0){
 					cmd_info_reg();
 				}
-				else printf("Unknown command");
+				else printf("Unknown command 'info %s'\n",p);
 			}
 	   	}
+		else if(strcmp(p,"x")==0){
+			p = strtok(NULL," ");
+		    unsigned int a=0;
+  			if(p ==NULL){ printf("Unknown command 'x %s'\n",p); }
+		    else{
+				sscanf(p,"%u",&a);
+				p = strtok(NULL," ");
+				if(p ==NULL){ printf("Unknown command\n"); }
+				else{
+			  		 unsigned b=0;
+					 sscanf(p,"%x",&b);
+					 printf("%x\n",b);
+					 int i=0;
+					 while(i<a)
+					 {
+						printf("%02x ", swaddr_read(b + i, 1));
+					    i++;
+			   		 }
+					 printf("\n");
+				}
+			}
+		}
 
+
+
+			 
+
+
+			
 		/* TODO: Add more commands */
 
 		else { printf("Unknown command '%s'\n", p); }
