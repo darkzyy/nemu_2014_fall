@@ -89,6 +89,17 @@ static void cmd_si(unsigned int a){
 		}
 	cpu_exec(a);
 }
+static void cmd_b(char *p){
+		p=strtok(NULL," *");
+		if(p==NULL){printf("Unknown command 'b NULL'"); }
+		else{
+			unsigned a;
+			sscanf(p,"%x",&a);
+			swaddr_write(a,1,0xcc);
+		}
+		
+}
+
 
 static void cmd_info_reg(){
 	if(nemu_state == END) {
@@ -151,7 +162,6 @@ void main_loop() {
 				else{
 			  		 unsigned b=0;
 					 sscanf(p,"%x",&b);
-					 printf("%x\n",b);
 					 int i=0;
 					 while(i<a)
 					 {
@@ -162,6 +172,8 @@ void main_loop() {
 				}
 			}
 		}
+		else if(strcmp(p,"b")==0)	{cmd_b(p);}
+
 
 
 

@@ -16,10 +16,12 @@ make_helper(inv) {
 	assert(0);
 }
 
-make_helper(int3) {
+make_helper(int3) {/*参数是swaddr_t int3*/
 	/* A breakpoint is hit! Do something here! */
-	assert(0);
+	nemu_state=BP;
 
+	assert(0);
+	eip--;
 	return 1;
 }
 
