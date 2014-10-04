@@ -1,5 +1,5 @@
 #include "exec/helper.h"
-
+#include "ui/breakpoint.h"
 #include "ui/ui.h"
 
 #include "nemu.h"
@@ -18,10 +18,15 @@ make_helper(inv) {
 
 make_helper(int3) {/*参数是swaddr_t int3*/
 	/* A breakpoint is hit! Do something here! */
-	nemu_state=BP;
-
-	assert(0);
-	eip--;
+	nemu_state=BPS1;
+	printf("break point hit\n");
+	printf("%x\n",eip);
+	swaddr_write(eip,1,find_pre_inc(eip));
+/*	for(i=0;i<NR_BP-1;i++){
+		if(bp_pool[i].addr==eip){
+			break;
+		}
+	}*/
 	return 1;
 }
 

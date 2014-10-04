@@ -1,4 +1,5 @@
 #include "ui/ui.h"
+#include "ui/breakpoint.h"
 
 #include "nemu.h"
 
@@ -11,7 +12,6 @@ int nemu_state = END;
 
 void cpu_exec(uint32_t);
 void restart();
-
 /* We use the readline library to provide more flexibility to read from stdin. */
 char* rl_gets() {
 	static char *line_read = NULL;
@@ -54,10 +54,10 @@ static void cmd_c() {
 		puts("The Program does not start. Use 'r' command to start the program.");
 		return;
 	}
-
-	nemu_state = RUNNING;
+	if(nemu_state!=BPS2)
+		nemu_state = RUNNING;
 	cpu_exec(-1);
-	if(nemu_state != END) { nemu_state = STOP; }
+	if(nemu_state != END&&nemu_state !=BPS2) { nemu_state = STOP; }
 }
 
 static void cmd_r() {
@@ -84,22 +84,35 @@ restart_:
 static void cmd_si(unsigned int a){
 	if(nemu_state == END){
 		restart();
-		nemu_state =STOP;
 		nemu_state = RUNNING;
-		}
+	}
 	cpu_exec(a);
 }
 static void cmd_b(char *p){
 		p=strtok(NULL," *");
 		if(p==NULL){printf("Unknown command 'b NULL'"); }
 		else{
-			unsigned a;
+			swaddr_t a;
 			sscanf(p,"%x",&a);
+			add_bp(a,swaddr_read(a,1));
 			swaddr_write(a,1,0xcc);
 		}
 		
 }
+static void cmd_d(char *p){
+	p=strtok(NULL," ");
+	if(p==NULL){printf("Unknown command 'd NULL'");}
+	else{
+		int a;
+		sscanf(p,"%d",&a);
+		swaddr_write(find_bp(a),1,find_pre_inc(find_bp(a)));
+		free_bp(a-1);
+	}
+}
 
+static void cmd_info_b(){
+	printb();
+}
 
 static void cmd_info_reg(){
 	if(nemu_state == END) {
@@ -148,6 +161,9 @@ void main_loop() {
 				if(strcmp(p,"r")==0){
 					cmd_info_reg();
 				}
+				else if(strcmp(p,"b")==0){
+					cmd_info_b();
+				}
 				else printf("Unknown command 'info %s'\n",p);
 			}
 	   	}
@@ -167,13 +183,14 @@ void main_loop() {
 					 {
 						printf("%02x ", swaddr_read(b + i, 1));
 					    i++;
+					 	if(i%5 == 0)
+							 printf("\n");
 			   		 }
-					 printf("\n");
 				}
 			}
 		}
 		else if(strcmp(p,"b")==0)	{cmd_b(p);}
-
+		else if(strcmp(p,"d")==0)   {cmd_d(p);}
 
 
 

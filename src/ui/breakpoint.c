@@ -12,14 +12,79 @@ void init_bp_pool() {
 	for(i = 0; i < NR_BP - 1; i ++) {
 		bp_pool[i].NO = i;
 		bp_pool[i].next = &bp_pool[i + 1];
+		bp_pool[i].addr =0;
+		bp_pool[i].pre_inc=0;
 	}
 	ftail =&bp_pool[i];
+	ftail->NO=i;
 	bp_pool[i].next = NULL;
 
 	head = NULL;
 	free_ = bp_pool;
 	tail = NULL;
 }
+swaddr_t find_bp(int a){
+	assert(head);
+	BP *p=head;
+	while(a!=1){
+		a--;
+		if(p->next!=NULL)
+			p=p->next;
+		else
+			printf("error input\n");
+	}
+	return p->addr;
+}
+void printb(){
+	/*printf("head:\n");
+	if(head!=NULL){
+		BP *p=head;
+		printf("%d	%p	%p %x %x\n",p->NO,p,p->next,p->addr,p->pre_inc);
+		while(p->next!=NULL){
+			p=p->next;
+			printf("%d	%p	%p %x %x\n",p->NO,p,p->next,p->addr,p->pre_inc);
+		}
+	}
+	printf("free:\n");
+	if(free_!=NULL){
+		BP *p=free_;
+		printf("%d	%p	%p %x %x\n",p->NO,p,p->next,p->addr,p->pre_inc);
+		while(p!=ftail){
+			p=p->next;
+			printf("%d	%p	%p %x %x\n",p->NO,p,p->next,p->addr,p->pre_inc);
+		}
+	}*/
+	int i=1;
+	if(head==NULL){
+		printf("all is wrong \n");
+		return;
+	}
+	BP *p=head;
+	printf("%d:		addr:%x		inc:%x\n",i,p->addr,p->pre_inc);
+	while(p!=tail){
+		p=p->next;
+		i++;
+		printf("%d:		addr:%x		inc:%x\n",i,p->addr,p->pre_inc);
+	}
+}
+
+int find_pre_inc(swaddr_t eip){
+	if(head->addr==eip)
+		return head->pre_inc;
+	BP *p=head;
+	while(p!= tail){
+		p=p->next;
+		if(p->addr==eip)
+			return p->pre_inc;
+	}
+	if(head==tail){
+		printf("eip error\n");
+		return 0;
+	}
+	printf("unknown error\n");
+	return 0;
+}
+
 void reno(){
 	if(free_==NULL){printf("free_ NULL");}
 	else {
@@ -41,6 +106,19 @@ void add_bp(swaddr_t addr,int inc){
 		tail=free_;
 	}
 	else {
+		if(head->addr==addr){
+			printf("already exists\n");
+			return;
+		}
+		BP *p=head;
+		while(p!=tail){
+			p=p->next;
+			if(p->addr==addr){
+				printf("already exists\n");
+				return;
+			}
+		}
+
 		tail->next =free_;
 		tail=tail->next;
 	}
@@ -66,6 +144,8 @@ void free_bp(int NO){
 			return ;
 		}
 		p->next->NO=ftail->NO+1;
+		p->next->addr=0;
+		p->next->pre_inc=0;
 		ftail->next=p->next;
 		ftail=ftail->next;
 		if (p->next->next!=NULL){
@@ -77,24 +157,38 @@ void free_bp(int NO){
 		}
 		else
 			p->next=NULL;
+		tail=p;
 		ftail->next=NULL;
 		reno();			/*重置free_断点序号*/
 		printf("返回成功\n");
 	}
 	else{/*第一个结点为NO*/
 		p->NO=ftail->NO+1;
+		p->addr=0;
+		p->pre_inc=0;
 		ftail->next=head;
 		ftail=ftail->next;
-		head=head->next;
-		p=head;
-		p->NO--;
-		while(p->next!=NULL){/*重置head中的序号*/
-			p=p->next;
+		if(head->next!=NULL){
+			head=head->next;
+			p=head;
 			p->NO--;
+			while(p->next!=NULL){/*重置head中的序号*/
+				p=p->next;
+				p->NO--;
+			}
+			tail=p;
+			ftail->next=NULL;
+			reno();
+			printf("返回成功(head !=NULL)\n");
 		}
-		ftail->next=NULL;
-		reno();
-		printf("返回成功(head =NULL)\n");
+		else{
+			head->addr=0;
+			head->pre_inc=0;
+			head=NULL;
+			tail=NULL;
+			reno();
+			printf("返回成功(head =NULL)\n");
+		}
 	}
 
 }

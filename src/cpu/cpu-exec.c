@@ -46,7 +46,6 @@ void cpu_exec(volatile uint32_t n) {
 		int instr_len = exec(cpu.eip);
 
 		cpu.eip += instr_len;
-
 		if(n_temp != -1 || (enable_debug && !quiet)) {
 			print_bin_instr(eip_temp, instr_len);
 			puts(assembly);
@@ -57,5 +56,14 @@ void cpu_exec(volatile uint32_t n) {
 			return;
 		} 
 		else if(nemu_state == END) { return; }
+		else if(nemu_state == BPS1){
+			cpu.eip--;
+			nemu_state=BPS2;
+			return;
+		}
+		else if(nemu_state == BPS2){
+			swaddr_write(eip_temp,1,0xcc);	
+			nemu_state=RUNNING;
+		}
 	}
 }
