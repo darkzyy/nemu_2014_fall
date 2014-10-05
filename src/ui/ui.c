@@ -8,6 +8,7 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
+extern uint32_t expr(char *e,bool *success);
 int nemu_state = END;
 
 void cpu_exec(uint32_t);
@@ -110,6 +111,12 @@ static void cmd_d(char *p){
 	}
 }
 
+static void cmd_p(char *p){
+	p=strtok(NULL," ");
+	bool suc=0;
+	expr(p,&suc);
+}
+
 static void cmd_info_b(){
 	printb();
 }
@@ -191,6 +198,7 @@ void main_loop() {
 		}
 		else if(strcmp(p,"b")==0)	{cmd_b(p);}
 		else if(strcmp(p,"d")==0)   {cmd_d(p);}
+		else if(strcmp(p,"p")==0)	{cmd_p(p);}
 
 
 
