@@ -1,5 +1,5 @@
 #include "common.h"
-
+#include "cpu/reg.h"
 /* We use the POSIX regex functions to process regular expressions.
  * Type 'man regex' for more information about POSIX regex functions.
  */
@@ -7,7 +7,7 @@
 #include <regex.h>
 
 enum {
-	NOTYPE = 256, plus='+', min='-', time='*', div='/', EQ, NUM, l='(', r= ')',NEG=0,DEREF,HNUM
+	NOTYPE = 256, plus='+', min='-', time='*', div='/', EQ, NUM, l='(', r= ')',NEG=0,DEREF,HNUM,REG
 
 	/* TODO: Add more token types */
 
@@ -21,6 +21,7 @@ static struct rule {
 	/* TODO: Add more rules.
 	 * Pay attention to the precedence level of different rules.
 	 */
+	{"\\$[e][a-z]{2}", REG},
 	{"0[Xx][0-9a-fA-F]+", HNUM},
 	{"[0-9]+", NUM},
 	{" +", NOTYPE},				// white space
@@ -85,6 +86,14 @@ static bool make_token(char *e) {
 				 */
 				switch(rules[i].token_type) {
 					case NOTYPE: break;
+					case REG:
+							for(j=0;j<substr_len;j++){
+								tokens[nr_token].str[j]=substr_start[j];
+							}
+							tokens[nr_token].type=REG;
+							nr_token++;
+							break;
+							
 					case NUM: 
 							for(j=0;j<substr_len;j++){
 								tokens[nr_token].str[j]=substr_start[j];
@@ -166,7 +175,7 @@ static bool check_parentheses(int p,int q){
 }
 static int char2int(int p){
 	int i=0,x=0,y=1;
-	printf("%c %c %c %c\n",tokens[p].str[0],tokens[p].str[1],tokens[p].str[2],tokens[p].str[3]);
+	//printf("%c %c %c %c\n",tokens[p].str[0],tokens[p].str[1],tokens[p].str[2],tokens[p].str[3]);
 	while(tokens[p].str[i]!='a'){
 		i++;
 	}
@@ -182,7 +191,7 @@ static int char2int(int p){
 }
 static int hex210(int p){
 	int i=0,x=0,y=1;
-	printf("%c %c %c %c\n",tokens[p].str[0],tokens[p].str[1],tokens[p].str[2],tokens[p].str[3]);
+	//printf("%c %c %c %c\n",tokens[p].str[0],tokens[p].str[1],tokens[p].str[2],tokens[p].str[3]);
 	while(tokens[p].str[i]!='a'){
 		i++;
 	}
@@ -201,6 +210,28 @@ static int hex210(int p){
 	printf("hex 2 10 suc,x=%d\n",x);
 	fflush(stdout);
 	return x;
+}
+static int reg2int(int p){
+	if(tokens[p].str[2]=='a'&&tokens[p].str[3]=='x')
+		return cpu.eax;
+	else if(tokens[p].str[2]=='c'&&tokens[p].str[3]=='x')
+		return cpu.ecx;
+	else if(tokens[p].str[2]=='d'&&tokens[p].str[3]=='x')
+		return cpu.edx;
+	else if(tokens[p].str[2]=='b'&&tokens[p].str[3]=='x')
+		return cpu.ebx;
+	else if(tokens[p].str[2]=='s'&&tokens[p].str[3]=='p')
+		return cpu.esp;
+	else if(tokens[p].str[2]=='b'&&tokens[p].str[3]=='p')
+		return cpu.ebp;
+	else if(tokens[p].str[2]=='s'&&tokens[p].str[3]=='i')
+		return cpu.esi;
+	else if(tokens[p].str[2]=='d'&&tokens[p].str[3]=='i')
+		return cpu.edi;
+	else 
+		printf("bad reg request\n");
+		return 0;
+	
 }
 const int top=10000;
 
@@ -260,7 +291,10 @@ static int eval(int p,int q){
 		printf("p=q\n");
 		if(tokens[p].type==NUM)
 			return char2int(p);
-		return hex210(p);
+		else if(tokens[p].type==HNUM)
+			return hex210(p);
+		else
+			return reg2int(p);
 	}
 	else if(check_parentheses(p,q)==true){
 		return eval(p+1,q-1);
