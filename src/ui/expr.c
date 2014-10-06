@@ -7,7 +7,7 @@
 #include <regex.h>
 
 enum {
-	NOTYPE = 256, plus='+', min='-', time='*', div='/', EQ, NUM, l='(', r= ')',NEG=0,DEREF
+	NOTYPE = 256, plus='+', min='-', time='*', div='/', EQ, NUM, l='(', r= ')',NEG=0,DEREF,HNUM
 
 	/* TODO: Add more token types */
 
@@ -21,6 +21,7 @@ static struct rule {
 	/* TODO: Add more rules.
 	 * Pay attention to the precedence level of different rules.
 	 */
+	{"0[Xx][0-9a-fA-F]+", HNUM},
 	{"[0-9]+", NUM},
 	{" +", NOTYPE},				// white space
 	{"\\*", '*'},
@@ -30,6 +31,7 @@ static struct rule {
 	{"\\(", '('},
 	{"\\)", ')'},
 	{"==", EQ}						// equal
+
 };
 
 #define NR_REGEX (sizeof(rules) / sizeof(rules[0]) )
@@ -89,6 +91,14 @@ static bool make_token(char *e) {
 							}
 							tokens[nr_token].str[j]='a';
 							tokens[nr_token].type=NUM;
+							nr_token++;
+							break;
+					case HNUM:
+							for(j=0;j<substr_len;j++){
+								tokens[nr_token].str[j]=substr_start[j];
+							}
+							tokens[nr_token].str[j]='a';
+							tokens[nr_token].type=HNUM;
 							nr_token++;
 							break;
 					case '+':
@@ -170,6 +180,28 @@ static int char2int(int p){
 	fflush(stdout);
 	return x;
 }
+static int hex210(int p){
+	int i=0,x=0,y=1;
+	printf("%c %c %c %c\n",tokens[p].str[0],tokens[p].str[1],tokens[p].str[2],tokens[p].str[3]);
+	while(tokens[p].str[i]!='a'){
+		i++;
+	}
+	i--;
+	while(tokens[p].str[i]!='x'&&tokens[p].str[i]!='X'){
+		if(tokens[p].str[i]>='A'&&tokens[p].str[i]<='F')
+				x+=(tokens[p].str[i]-'A'+10)*y;
+		else if(tokens[p].str[i]>='a'&&tokens[p].str[i]<='f')
+				x+=(tokens[p].str[i]-'a'+10)*y;
+		else
+				x+=(tokens[p].str[i]+1-'1')*y;
+
+		i--;
+		y*=16;
+	}
+	printf("hex 2 10 suc,x=%d\n",x);
+	fflush(stdout);
+	return x;
+}
 const int top=10000;
 
 static int domin_op(int p,int q){
@@ -205,11 +237,11 @@ static int domin_op(int p,int q){
 			min=i;
 		i--;
 	}
-	printf("-------------------\n");
+	/*printf("-------------------\n");
 	for(i=p;i<=q;i++){
 		printf("%d	%d	",a[i],tokens[i].type);
 	}
-	printf("\n-------------------\n");
+	printf("\n-------------------\n");*/
 	printf("found=%d\n",min);
 	return min;
 }
@@ -226,7 +258,9 @@ static int eval(int p,int q){
 	}
 	else if(p==q){
 		printf("p=q\n");
-		return char2int(p);
+		if(tokens[p].type==NUM)
+			return char2int(p);
+		return hex210(p);
 	}
 	else if(check_parentheses(p,q)==true){
 		return eval(p+1,q-1);
