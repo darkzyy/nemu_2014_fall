@@ -1,7 +1,8 @@
 #include "ui/breakpoint.h"
 
 #include "nemu.h"
-
+#include <string.h>
+#include <stdlib.h>
 #define NR_BP 32
 extern uint32_t expr(char *e,bool *success);
 static BP bp_pool[NR_BP];
@@ -138,7 +139,7 @@ void add_bp(swaddr_t addr,int inc){
 }
 void add_wp(char *exp){
 	if(free_->next==NULL){
-		printf("free_已用尽/n");
+		printf("free_已用尽\n");
 		return;	
 	};
 	if(head==NULL){
@@ -146,14 +147,14 @@ void add_wp(char *exp){
 		tail=free_;
 	}
 	else {
-		if(strcmp(exp,head->exp)==0){
+		if(head->type==1&&strcmp(exp,head->exp)==0){
 			printf("already exists\n");
 			return;
 		}
 		BP *p=head;
 		while(p!=tail){
 			p=p->next;
-			if(strcmp(exp,p->exp)==0){
+			if(p->type==1&&strcmp(exp,p->exp)==0){
 				printf("already exists\n");
 				return;
 			}
@@ -163,9 +164,10 @@ void add_wp(char *exp){
 		tail=tail->next;
 	}
 	free_=free_->next;
-	sscanf(exp,"%s",tail->exp);
+	printf("166\n");fflush(stdout);
+	tail->exp=strdup(exp);
 	bool suc=0;
-	tail->pre_val=expr(exp,&suc);
+	tail->pre_val=expr(tail->exp,&suc);
 	tail->type=1;
 	printf("%d\n",tail->pre_val);
 	tail->next=NULL;
@@ -188,7 +190,11 @@ void free_bp(int NO){
 		}
 		p->next->NO=ftail->NO+1;
 		p->next->addr=0;
+		p->next->type = 0;
+		p->next->pre_val =0;
 		p->next->pre_inc=0;
+		free(p->next->exp);
+		sscanf("\0","%s",p->next->exp);
 		ftail->next=p->next;
 		ftail=ftail->next;
 		if (p->next->next!=NULL){
@@ -208,7 +214,11 @@ void free_bp(int NO){
 	else{/*第一个结点为NO*/
 		p->NO=ftail->NO+1;
 		p->addr=0;
+		p->type =0;
+		p->pre_val=0;
 		p->pre_inc=0;
+		free(p->exp);
+		sscanf("\0","%s",p->exp);
 		ftail->next=head;
 		ftail=ftail->next;
 		if(head->next!=NULL){
@@ -233,6 +243,28 @@ void free_bp(int NO){
 			printf("返回成功(head =NULL)\n");
 		}
 	}
+
+}
+bool wp_change(){
+	if(head==NULL){
+		return 0;
+	}
+	bool *suc=0;
+	if(head->type==1&&expr(head->exp,suc)!=head->pre_val){
+		printf("watchpoint		%d!\n",head->NO);
+		head->pre_val=expr(head->exp,suc);
+		return 1;
+	}
+	BP *p=head;
+	while(p!=tail){
+		p=p->next;
+		if(p->type==1&&expr(p->exp,suc)!=p->pre_val){
+		 	printf("watchpoint		%d!\n",p->NO);
+			p->pre_val=expr(p->exp,suc);
+			return 1;
+		}
+	}
+	return 0;
 
 }
 

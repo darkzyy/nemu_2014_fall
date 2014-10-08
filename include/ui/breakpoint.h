@@ -24,5 +24,6 @@ void free_bp(int NO);
 void reno();
 int find_pre_inc(swaddr_t eip);
 void printb();
+bool wp_change();
 swaddr_t find_bp(int a);
 #endif

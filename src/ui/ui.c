@@ -88,13 +88,15 @@ static void cmd_si(unsigned int a){
 		nemu_state = RUNNING;
 	}
 	cpu_exec(a);
+	if(nemu_state != END&&nemu_state !=BPS2) { nemu_state = STOP; }
 }
 static void cmd_b(char *p){
 		p=strtok(NULL," *");
 		if(p==NULL){printf("Unknown command 'b NULL'"); }
 		else{
-			swaddr_t a;
-			sscanf(p,"%x",&a);
+			bool *suc=0;
+			swaddr_t a=expr(p,suc);
+			//sscanf(p,"%x",&a);
 			add_bp(a,swaddr_read(a,1));
 			swaddr_write(a,1,0xcc);
 		}
@@ -195,8 +197,9 @@ void main_loop() {
 				p = strtok(NULL," ");
 				if(p ==NULL){ printf("Unknown command\n"); }
 				else{
-			  		 unsigned b=0;
-					 sscanf(p,"%x",&b);
+					bool *suc=0;
+			  		 uint32_t b=expr(p,suc);
+					 //sscanf(p,"%x",&b);
 					 int i=0;
 					 while(i<a)
 					 {

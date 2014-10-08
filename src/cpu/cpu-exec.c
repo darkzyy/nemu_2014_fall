@@ -1,5 +1,5 @@
 #include "ui/ui.h"
-
+#include "ui/breakpoint.h"
 #include "nemu.h"
 
 #include <setjmp.h>
@@ -65,5 +65,6 @@ void cpu_exec(volatile uint32_t n) {
 			swaddr_write(eip_temp,1,0xcc);	
 			nemu_state=RUNNING;
 		}
+		else if(wp_change()) {return;}
 	}
 }
