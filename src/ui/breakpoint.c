@@ -3,17 +3,20 @@
 #include "nemu.h"
 
 #define NR_BP 32
-
+extern uint32_t expr(char *e,bool *success);
 static BP bp_pool[NR_BP];
 static BP *head, *free_, *tail, *ftail;
 
 void init_bp_pool() {
 	int i;
 	for(i = 0; i < NR_BP - 1; i ++) {
+		bp_pool[i].type = 0;
 		bp_pool[i].NO = i;
 		bp_pool[i].next = &bp_pool[i + 1];
 		bp_pool[i].addr =0;
 		bp_pool[i].pre_inc=0;
+		bp_pool[i].pre_val=0;
+		sscanf("\0","%s",bp_pool[i].exp);
 	}
 	ftail =&bp_pool[i];
 	ftail->NO=i;
@@ -60,11 +63,17 @@ void printb(){
 		return;
 	}
 	BP *p=head;
-	printf("%d:		addr:%x		inc:%x\n",i,p->addr,p->pre_inc);
+	if(p->type==0)
+		printf("%d:		addr:%x		inc:%x\n",i,p->addr,p->pre_inc);
+	else
+		printf("%d:		watchpoint		pre_val:%d\n",i,p->pre_val);
 	while(p!=tail){
 		p=p->next;
 		i++;
-		printf("%d:		addr:%x		inc:%x\n",i,p->addr,p->pre_inc);
+		if(p->type==0)
+			printf("%d:		addr:%x		inc:%x\n",i,p->addr,p->pre_inc);
+		else
+			printf("%d:		watchpoint		pre_val:%d\n",i,p->pre_val);
 	}
 }
 
@@ -125,6 +134,40 @@ void add_bp(swaddr_t addr,int inc){
 	free_=free_->next;
 	tail->addr=addr;
 	tail->pre_inc=inc;
+	tail->next=NULL;
+}
+void add_wp(char *exp){
+	if(free_->next==NULL){
+		printf("free_已用尽/n");
+		return;	
+	};
+	if(head==NULL){
+		head =free_;
+		tail=free_;
+	}
+	else {
+		if(strcmp(exp,head->exp)==0){
+			printf("already exists\n");
+			return;
+		}
+		BP *p=head;
+		while(p!=tail){
+			p=p->next;
+			if(strcmp(exp,p->exp)==0){
+				printf("already exists\n");
+				return;
+			}
+		}
+
+		tail->next =free_;
+		tail=tail->next;
+	}
+	free_=free_->next;
+	sscanf(exp,"%s",tail->exp);
+	bool suc=0;
+	tail->pre_val=expr(exp,&suc);
+	tail->type=1;
+	printf("%d\n",tail->pre_val);
 	tail->next=NULL;
 }
 void free_bp(int NO){

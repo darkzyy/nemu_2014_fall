@@ -116,6 +116,18 @@ static void cmd_p(char *p){
 	bool suc=0;
 	expr(p,&suc);
 }
+static void cmd_w(char *p){
+	p=strtok(NULL," ");
+	bool suc=1;
+	expr(p,&suc);
+	printf("suc=%d\n",suc);
+	if(suc==1){
+		printf("adding\n");
+		fflush(stdout);
+		add_wp(p);
+	}
+
+}
 
 static void cmd_info_b(){
 	printb();
@@ -199,6 +211,7 @@ void main_loop() {
 		else if(strcmp(p,"b")==0)	{cmd_b(p);}
 		else if(strcmp(p,"d")==0)   {cmd_d(p);}
 		else if(strcmp(p,"p")==0)	{cmd_p(p);}
+		else if(strcmp(p,"w")==0)	{cmd_w(p);}
 
 
 

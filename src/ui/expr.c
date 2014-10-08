@@ -1,5 +1,6 @@
 #include "common.h"
 #include "cpu/reg.h"
+#include "memory.h" 
 /* We use the POSIX regex functions to process regular expressions.
  * Type 'man regex' for more information about POSIX regex functions.
  */
@@ -7,8 +8,7 @@
 #include <regex.h>
 
 enum {
-	NOTYPE = 256, plus='+', min='-', time='*', div='/', EQ, NUM, l='(', r= ')',NEG=0,DEREF,HNUM,REG
-
+	NOTYPE = 256, plus='+', min='-', time='*', div='/',mod='%', l='(', r=')',EQ=0,NEQ,LESS,MORE,LESSEQ,MOREEQ, NUM, HNUM,REG,OR,AND,BOR,BXOR,BAND,LSFT,RSFT,BN,BANG,DEREF,NEG
 	/* TODO: Add more token types */
 
 };
@@ -21,17 +21,32 @@ static struct rule {
 	/* TODO: Add more rules.
 	 * Pay attention to the precedence level of different rules.
 	 */
-	{"\\$[e][a-z]{2}", REG},
+	{"\\$[e][a-z]{2}", REG},			//0
 	{"0[Xx][0-9a-fA-F]+", HNUM},
 	{"[0-9]+", NUM},
 	{" +", NOTYPE},				// white space
 	{"\\*", '*'},
-	{"\\/", '/'},
+	{"\\/", '/'},					//5
 	{"\\+", '+'},					// plus
 	{"\\-", '-'},
 	{"\\(", '('},
 	{"\\)", ')'},
-	{"==", EQ}						// equal
+	{"\\^",BXOR},					//10
+	{"<<",LSFT},					
+	{">>",RSFT},
+	{"==", EQ},						// equal
+	{"!=",NEQ},
+	{">=",MOREEQ},					//15
+	{"<=",LESSEQ},					
+	{"<",LESS},
+	{">",MORE},
+	{"\\|{2}",OR},						
+	{"\\&{2}",AND},					//20
+	{"\\&",BAND},
+	{"\\|",BOR},
+	{"\\%",'%'},
+	{"\\~",BN},
+	{"\\!",BANG}					//25
 
 };
 
@@ -78,6 +93,7 @@ static bool make_token(char *e) {
 				char *substr_start = e + position;
 				int substr_len = pmatch.rm_eo;
 				Log("match regex[%d] at position %d with len %d: %.*s", i, position, substr_len, substr_len, substr_start);
+				assert(substr_len);
 				position += substr_len;
 				int j;
 
@@ -92,14 +108,17 @@ static bool make_token(char *e) {
 							}
 							tokens[nr_token].type=REG;
 							nr_token++;
-							break;
-							
+							break;				
 					case NUM: 
 							for(j=0;j<substr_len;j++){
 								tokens[nr_token].str[j]=substr_start[j];
 							}
 							tokens[nr_token].str[j]='a';
 							tokens[nr_token].type=NUM;
+							nr_token++;
+							break;
+					case DEREF: 
+							tokens[nr_token].type=DEREF;
 							nr_token++;
 							break;
 					case HNUM:
@@ -134,7 +153,70 @@ static bool make_token(char *e) {
 						tokens[nr_token].type=')';
 						nr_token++;
 						break;
-
+					case EQ:
+						tokens[nr_token].type=EQ;
+						nr_token++;
+						break;
+					case NEQ:
+						tokens[nr_token].type=NEQ;
+						nr_token++;
+						break;
+					case LESS:
+						tokens[nr_token].type=LESS;
+						nr_token++;
+						break;
+					case MORE:
+						tokens[nr_token].type=MORE;
+						nr_token++;
+						break;
+					case MOREEQ:
+						tokens[nr_token].type=MOREEQ;
+						nr_token++;
+						break;
+					case LESSEQ:
+						tokens[nr_token].type=LESSEQ;
+						nr_token++;
+						break;
+					case OR:
+						tokens[nr_token].type=OR;
+						nr_token++;
+						break;
+					case AND:
+						tokens[nr_token].type=AND;
+						nr_token++;
+						break;
+					case BOR:
+						tokens[nr_token].type=BOR;
+						nr_token++;
+						break;
+					case BXOR:
+						tokens[nr_token].type=BXOR;
+						nr_token++;
+						break;
+					case BAND:
+						tokens[nr_token].type=BAND;
+						nr_token++;
+						break;
+					case LSFT:
+						tokens[nr_token].type=LSFT;
+						nr_token++;
+						break;
+					case RSFT:
+						tokens[nr_token].type=RSFT;
+						nr_token++;
+						break;
+					case '%':
+						tokens[nr_token].type='%';
+						nr_token++;
+						break;
+					case BN:
+						tokens[nr_token].type=BN;
+						nr_token++;
+						break;
+					case BANG:
+						tokens[nr_token].type=BANG;
+						nr_token++;
+						break;
 
 					default: assert(0);
 				}
@@ -185,7 +267,7 @@ static int char2int(int p){
 		i--;
 		y*=10;
 	}
-	printf("c 2 i suc,x=%d\n",x);
+	//printf("c 2 i suc,x=%d\n",x);
 	fflush(stdout);
 	return x;
 }
@@ -207,7 +289,7 @@ static int hex210(int p){
 		i--;
 		y*=16;
 	}
-	printf("hex 2 10 suc,x=%d\n",x);
+	//printf("hex 2 10 suc,x=%d\n",x);
 	fflush(stdout);
 	return x;
 }
@@ -233,39 +315,57 @@ static int reg2int(int p){
 		return 0;
 	
 }
+
 const int top=10000;
 
 static int domin_op(int p,int q){
 	printf("finding domin op\n");
 	fflush(stdout);
 	int a[32];
-	int stage=0,i=p,j=0,deep=100;
+	int stage=0,i=p,j=0;
 	for(;j<32;j++)
 		a[j]=top;//一个足够大的数
 	while(i<=q){
 		if(tokens[i].type == '+'||tokens[i].type == '-')
-			a[i]=stage+1;
-		else if(tokens[i].type =='*'||tokens[i].type =='/')
+			a[i]=stage+9;
+		else if(tokens[i].type =='*'||tokens[i].type =='/'||tokens[i].type =='%')
+			a[i]=stage+10;
+		else if(tokens[i].type ==NEG||tokens[i].type ==BN||tokens[i].type ==BANG||tokens[i].type ==DEREF)
+			a[i]=stage+11;
+		else if(tokens[i].type == LSFT||tokens[i].type == RSFT)
+			a[i]=stage+8;
+		else if(tokens[i].type ==LESS||tokens[i].type ==MORE||tokens[i].type ==LESSEQ||tokens[i].type ==MOREEQ)
+			a[i]=stage+7;
+		else if(tokens[i].type ==EQ||tokens[i].type ==NEQ)
+			a[i]=stage+6;
+		else if(tokens[i].type ==BAND)
+			a[i]=stage+5;
+		else if(tokens[i].type ==BXOR)
+			a[i]=stage+4;
+		else if(tokens[i].type ==BOR)
+			a[i]=stage+3;
+		else if(tokens[i].type ==AND)
 			a[i]=stage+2;
-		else if(tokens[i].type ==NEG){
-			a[i]=top-deep+stage+1;
-			deep--;
-		}
+		else if(tokens[i].type ==OR)
+			a[i]=stage+1;
 		else if(tokens[i].type =='('){
-			stage+=2;
-			deep=100;
+			stage+=12;
 		}
 		else if(tokens[i].type ==')')
-			stage-=2;
-		else if(tokens[i].type ==NUM)
-			deep=100;
+			stage-=12;
 		i++;
 	}
 	i=q;
 	int min=q;
 	while(i>=p){
-		if(a[i]<a[min])
-			min=i;
+		if(a[min]%12==11){
+			if(a[i]<=a[min])
+				min=i;
+		}
+		else{
+			if(a[i]<a[min])
+				min=i;
+		}
 		i--;
 	}
 	/*printf("-------------------\n");
@@ -277,23 +377,22 @@ static int domin_op(int p,int q){
 	return min;
 }
 static int eval(int p,int q){
-	printf("evaluating\np=%d,q=%d\n",p,q);
+	printf("evaluating:	p=%d,q=%d\n",p,q);
 	fflush(stdout);
 	if(p>q){
-		if((q!=p-1)||tokens[p].type!=NEG){
-			printf("bad expr\n");
-			assert(0);
+		if((q==p-1)&&(tokens[p].type==NEG||tokens[p].type==BN||tokens[p].type==BANG||tokens[p].type==DEREF)){
+			return 0;
 		}
 		else
-			return 0;
+			printf("bad expr\n");
+			assert(0);
 	}
 	else if(p==q){
-		printf("p=q\n");
 		if(tokens[p].type==NUM)
 			return char2int(p);
 		else if(tokens[p].type==HNUM)
 			return hex210(p);
-		else
+		else 
 			return reg2int(p);
 	}
 	else if(check_parentheses(p,q)==true){
@@ -308,7 +407,24 @@ static int eval(int p,int q){
 			case '-':return val1-val2;
 			case '*':return val1*val2;
 			case '/':return val1/val2;
+			case '%':return val1%val2;
+			case EQ:return val1==val2;
+			case NEQ:return val1!=val2;
+			case LESS:return val1<val2;
+			case MORE:return val1>val2;
+			case LESSEQ:return val1<=val2;
+			case MOREEQ:return val1>=val2;
+			case OR:return val1||val2;
+			case AND:return val1&&val2;
+			case BOR:return val1|val2;
+			case BAND:return val1&val2;
+			case BXOR:return val1^val2;
+			case LSFT:return val1<<val2;
+			case RSFT:return val1>>val2;
 			case NEG:return -val2;
+			case BANG:return !val2;
+			case BN:return ~val2;
+			case DEREF:return swaddr_read(val2,1);
 			default:assert(0);
 		}
 	}
@@ -331,9 +447,10 @@ uint32_t expr(char *e, bool *success) {
 		}
 	}
 	uint32_t p=0,q=nr_token-1;
-	printf("%d\n",eval(p,q));
+	uint32_t val=eval(p,q);
+	printf("%d\n",val);
 
 	/* TODO: Implement code to evaluate the expression. */
-	return 0;
+	return val;
 }
 
