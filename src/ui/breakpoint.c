@@ -60,21 +60,21 @@ void printb(){
 	}*/
 	int i=1;
 	if(head==NULL){
-		printf("all is wrong \n");
+		printf("bpbool=NULL \n");
 		return;
 	}
 	BP *p=head;
 	if(p->type==0)
 		printf("%d:		addr:%x		inc:%x\n",i,p->addr,p->pre_inc);
 	else
-		printf("%d:		watchpoint		pre_val:%d\n",i,p->pre_val);
+		printf("%d:		watchpoint:%s		pre_val:%d\n",i,p->exp,p->pre_val);
 	while(p!=tail){
 		p=p->next;
 		i++;
 		if(p->type==0)
 			printf("%d:		addr:%x		inc:%x\n",i,p->addr,p->pre_inc);
 		else
-			printf("%d:		watchpoint		pre_val:%d\n",i,p->pre_val);
+			printf("%d:		watchpoint:%s		pre_val:%d\n",i,p->exp,p->pre_val);
 	}
 }
 
@@ -164,12 +164,12 @@ void add_wp(char *exp){
 		tail=tail->next;
 	}
 	free_=free_->next;
-	printf("166\n");fflush(stdout);
+	//printf("166\n");fflush(stdout);
 	tail->exp=strdup(exp);
 	bool suc=0;
 	tail->pre_val=expr(tail->exp,&suc);
 	tail->type=1;
-	printf("%d\n",tail->pre_val);
+	//printf("%d\n",tail->pre_val);
 	tail->next=NULL;
 }
 void free_bp(int NO){
@@ -235,8 +235,6 @@ void free_bp(int NO){
 			printf("返回成功(head !=NULL)\n");
 		}
 		else{
-			head->addr=0;
-			head->pre_inc=0;
 			head=NULL;
 			tail=NULL;
 			reno();
@@ -251,7 +249,7 @@ bool wp_change(){
 	}
 	bool *suc=0;
 	if(head->type==1&&expr(head->exp,suc)!=head->pre_val){
-		printf("watchpoint		%d!\n",head->NO);
+		printf("watchpoint	%d:%s\npre_val:%x	now:%x\n",head->NO+1,head->exp,head->pre_val,expr(head->exp,suc));
 		head->pre_val=expr(head->exp,suc);
 		return 1;
 	}
@@ -259,13 +257,35 @@ bool wp_change(){
 	while(p!=tail){
 		p=p->next;
 		if(p->type==1&&expr(p->exp,suc)!=p->pre_val){
-		 	printf("watchpoint		%d!\n",p->NO);
+			printf("watchpoint	%d:%s\npre_val:%x	now:%x\n",p->NO+1,p->exp,p->pre_val,expr(p->exp,suc));
 			p->pre_val=expr(p->exp,suc);
 			return 1;
 		}
 	}
 	return 0;
 
+}
+void reload(){
+	if(head==NULL)
+		return;
+	if(head->type==0)
+		//printf("reloading\n");
+		head->pre_inc=swaddr_read(head->addr,1);
+		swaddr_write(head->addr,1,0xcc);
+	if(head->next==NULL)
+		return;
+	else{
+		BP *p=head;
+		while(p->next!=NULL){
+			p=p->next;
+			if(p->type==0){
+				//printf("reloading\n");
+				p->pre_inc=swaddr_read(p->addr,1);
+				swaddr_write(p->addr,1,0xcc);
+			}
+		}
+		return;
+	}
 }
 
 

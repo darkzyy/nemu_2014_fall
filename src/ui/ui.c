@@ -91,20 +91,26 @@ static void cmd_si(unsigned int a){
 	if(nemu_state != END&&nemu_state !=BPS2) { nemu_state = STOP; }
 }
 static void cmd_b(char *p){
-		p=strtok(NULL," *");
-		if(p==NULL){printf("Unknown command 'b NULL'"); }
+		p=strtok(NULL,"");
+		if(p==NULL){printf("Unknown command 'b NULL'\n"); }
+		else if(p[0]!='*'){printf("Unknown command\n"); }
 		else{
-			bool *suc=0;
-			swaddr_t a=expr(p,suc);
+			bool suc=1;
+			swaddr_t a=expr(p+1,&suc);
 			//sscanf(p,"%x",&a);
-			add_bp(a,swaddr_read(a,1));
-			swaddr_write(a,1,0xcc);
+			if(suc){
+				add_bp(a,swaddr_read(a,1));
+				swaddr_write(a,1,0xcc);
+			}
 		}
 		
 }
 static void cmd_d(char *p){
 	p=strtok(NULL," ");
-	if(p==NULL){printf("Unknown command 'd NULL'");}
+	if(p==NULL){printf("Unknown command 'd NULL'\n");}
+	else if(strcmp(p,"all")==0){
+		init_bp_pool();
+	}
 	else{
 		int a;
 		sscanf(p,"%d",&a);
@@ -114,18 +120,18 @@ static void cmd_d(char *p){
 }
 
 static void cmd_p(char *p){
-	p=strtok(NULL," ");
+	p=strtok(NULL,"");
 	bool suc=0;
-	expr(p,&suc);
+	printf("%d\n",expr(p,&suc));
 }
 static void cmd_w(char *p){
-	p=strtok(NULL," ");
+	p=strtok(NULL,"");
 	bool suc=1;
 	expr(p,&suc);
-	printf("suc=%d\n",suc);
+	//printf("suc=%d\n",suc);
 	if(suc==1){
-		printf("adding\n");
-		fflush(stdout);
+		//printf("adding\n");
+		//fflush(stdout);
 		add_wp(p);
 	}
 
@@ -194,20 +200,22 @@ void main_loop() {
   			if(p ==NULL){ printf("Unknown command 'x %s'\n",p); }
 		    else{
 				sscanf(p,"%u",&a);
-				p = strtok(NULL," ");
+				p= strtok(NULL,"");
 				if(p ==NULL){ printf("Unknown command\n"); }
 				else{
-					bool *suc=0;
-			  		 uint32_t b=expr(p,suc);
-					 //sscanf(p,"%x",&b);
-					 int i=0;
-					 while(i<a)
-					 {
-						printf("%02x ", swaddr_read(b + i, 1));
-					    i++;
-					 	if(i%5 == 0)
-							 printf("\n");
-			   		 }
+					bool suc=1;
+			  		 uint32_t b=expr(p,&suc);
+					 if(suc){
+					 	//sscanf(p,"%x",&b);
+						 int i=0;
+						 while(i<a)
+						 {
+							printf("%02x ", swaddr_read(b + i, 1));
+						    i++;
+						 	if(i%5 == 0)
+								 printf("\n");
+			   			 }
+					 }
 				}
 			}
 		}

@@ -21,8 +21,8 @@ static struct rule {
 	/* TODO: Add more rules.
 	 * Pay attention to the precedence level of different rules.
 	 */
-	{"\\$[e][a-z]{2}", REG},			//0
-	{"0[Xx][0-9a-fA-F]+", HNUM},
+	{"\\$[a-z]{2,3}", REG},			//0
+	{"0[Xx][[:xdigit:]]+", HNUM},
 	{"[0-9]+", NUM},
 	{" +", NOTYPE},				// white space
 	{"\\*", '*'},
@@ -92,7 +92,7 @@ static bool make_token(char *e) {
 			if(regexec(&re[i], e + position, 1, &pmatch, 0) == 0 && pmatch.rm_so == 0) {
 				char *substr_start = e + position;
 				int substr_len = pmatch.rm_eo;
-				Log("match regex[%d] at position %d with len %d: %.*s", i, position, substr_len, substr_len, substr_start);
+				//Log("match regex[%d] at position %d with len %d: %.*s", i, position, substr_len, substr_len, substr_start);
 				assert(substr_len);
 				position += substr_len;
 				int j;
@@ -103,9 +103,10 @@ static bool make_token(char *e) {
 				switch(rules[i].token_type) {
 					case NOTYPE: break;
 					case REG:
-							for(j=0;j<substr_len;j++){
-								tokens[nr_token].str[j]=substr_start[j];
+							for(j=1;j<substr_len;j++){
+								tokens[nr_token].str[j-1]=substr_start[j];
 							}
+							tokens[nr_token].str[j-1]='\0';
 							tokens[nr_token].type=REG;
 							nr_token++;
 							break;				
@@ -113,7 +114,7 @@ static bool make_token(char *e) {
 							for(j=0;j<substr_len;j++){
 								tokens[nr_token].str[j]=substr_start[j];
 							}
-							tokens[nr_token].str[j]='a';
+							tokens[nr_token].str[j]='\0';
 							tokens[nr_token].type=NUM;
 							nr_token++;
 							break;
@@ -125,7 +126,7 @@ static bool make_token(char *e) {
 							for(j=0;j<substr_len;j++){
 								tokens[nr_token].str[j]=substr_start[j];
 							}
-							tokens[nr_token].str[j]='a';
+							tokens[nr_token].str[j]='\0';
 							tokens[nr_token].type=HNUM;
 							nr_token++;
 							break;
@@ -256,9 +257,12 @@ static bool check_parentheses(int p,int q){
 	return false;
 }
 static int char2int(int p){
-	int i=0,x=0,y=1;
+	int x=0;
+	sscanf(tokens[p].str,"%d",&x);
+	return x;
+	/*int i=0,x=0,y=1;
 	//printf("%c %c %c %c\n",tokens[p].str[0],tokens[p].str[1],tokens[p].str[2],tokens[p].str[3]);
-	while(tokens[p].str[i]!='a'){
+	while(tokens[p].str[i]!='\0'){
 		i++;
 	}
 	i--;
@@ -269,10 +273,13 @@ static int char2int(int p){
 	}
 	//printf("c 2 i suc,x=%d\n",x);
 	fflush(stdout);
-	return x;
+	return x;*/
 }
 static int hex210(int p){
-	int i=0,x=0,y=1;
+	int x=0;
+	sscanf(tokens[p].str,"%x",&x);
+	return x;
+	/*int i=0,x=0,y=1;
 	//printf("%c %c %c %c\n",tokens[p].str[0],tokens[p].str[1],tokens[p].str[2],tokens[p].str[3]);
 	while(tokens[p].str[i]!='a'){
 		i++;
@@ -291,10 +298,10 @@ static int hex210(int p){
 	}
 	//printf("hex 2 10 suc,x=%d\n",x);
 	fflush(stdout);
-	return x;
+	return x;*/
 }
 static int reg2int(int p){
-	if(tokens[p].str[2]=='a'&&tokens[p].str[3]=='x')
+	/*if(tokens[p].str[2]=='a'&&tokens[p].str[3]=='x')
 		return cpu.eax;
 	else if(tokens[p].str[2]=='c'&&tokens[p].str[3]=='x')
 		return cpu.ecx;
@@ -309,18 +316,30 @@ static int reg2int(int p){
 	else if(tokens[p].str[2]=='s'&&tokens[p].str[3]=='i')
 		return cpu.esi;
 	else if(tokens[p].str[2]=='d'&&tokens[p].str[3]=='i')
-		return cpu.edi;
-	else 
-		printf("bad reg request\n");
-		return 0;
+		return cpu.edi;*/
+	int i;
+	for(i=0;i<8;i++){
+		if(strcmp(tokens[p].str,regsl[i])==0)
+			return reg_l(i);
+	}
+	for(i=0;i<8;i++){
+		if(strcmp(tokens[p].str,regsw[i])==0)
+			return reg_w(i);
+	}
+	for(i=0;i<8;i++){
+		if(strcmp(tokens[p].str,regsb[i])==0)
+			return reg_b(i);
+	} 
+	printf("bad reg request\n");
+	return 0;
 	
 }
 
 const int top=10000;
 
 static int domin_op(int p,int q){
-	printf("finding domin op\n");
-	fflush(stdout);
+	//printf("finding domin op\n");
+	//fflush(stdout);
 	int a[32];
 	int stage=0,i=p,j=0;
 	for(;j<32;j++)
@@ -373,11 +392,11 @@ static int domin_op(int p,int q){
 		printf("%d	%d	",a[i],tokens[i].type);
 	}
 	printf("\n-------------------\n");*/
-	printf("found=%d\n",min);
+	//printf("found=%d\n",min);
 	return min;
 }
 static int eval(int p,int q){
-	printf("evaluating:	p=%d,q=%d\n",p,q);
+	//printf("evaluating:	p=%d,q=%d\n",p,q);
 	fflush(stdout);
 	if(p>q){
 		if((q==p-1)&&(tokens[p].type==NEG||tokens[p].type==BN||tokens[p].type==BANG||tokens[p].type==DEREF)){
@@ -448,7 +467,7 @@ uint32_t expr(char *e, bool *success) {
 	}
 	uint32_t p=0,q=nr_token-1;
 	uint32_t val=eval(p,q);
-	printf("%d\n",val);
+	//printf("%d\n",val);
 
 	/* TODO: Implement code to evaluate the expression. */
 	return val;

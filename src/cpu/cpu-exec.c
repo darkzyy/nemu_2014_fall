@@ -26,6 +26,7 @@ void restart() {
 	cpu.eip = LOADER_START;
 
 	init_dram();
+	reload();//重新载入断点
 }
 
 static void print_bin_instr(swaddr_t eip, int len) {

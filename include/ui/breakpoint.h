@@ -18,6 +18,7 @@ typedef struct breakpoint {
 
 } BP;
 
+void init_bp_pool();
 void add_bp(swaddr_t addr,int inc);
 void add_wp(char *p);
 void free_bp(int NO);
@@ -25,5 +26,6 @@ void reno();
 int find_pre_inc(swaddr_t eip);
 void printb();
 bool wp_change();
+void reload();
 swaddr_t find_bp(int a);
 #endif
