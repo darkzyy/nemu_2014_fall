@@ -10,6 +10,7 @@ make_helper(dopcd0);
 make_helper(dopcd1);
 make_helper(dopcd2);
 make_helper(dopcd3);
+make_helper(dopcfe);
 make_helper(dopcff);
 
 #endif

@@ -4,7 +4,7 @@
 
 make_helper(concat(push_r_,SUFFIX)) {
 	int8_t opc=instr_fetch(eip,1);
-	int8_t mask_op=0xf;
+	int8_t mask_op=0x7;
 	reg_l(4)-=DATA_BYTE;
 	MEM_W(reg_l(4),REG(opc&mask_op));
 	print_asm("push" str(SUFFIX) " %%%s",REG_NAME(opc&mask_op));

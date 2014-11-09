@@ -168,10 +168,24 @@ make_helper(dopcd3) {
 				 }
 	}
 }
+make_helper(dopcfe) {
+	ModR_M m;
+	m.val=instr_fetch(eip+1,1);
+	switch (m.opcode){
+		case 0:return inc_rm_b(eip);break;
+		case 1:return dec_rm_b(eip);break;
+		default :{
+					 printf("dopcode error\n");
+					 assert(0);
+				 }
+	}
+}
 make_helper(dopcff) {
 	ModR_M m;
 	m.val=instr_fetch(eip+1,1);
 	switch (m.opcode){
+		case 0:return inc_rm_v(eip);break;
+		case 1:return dec_rm_v(eip);break;
 		case 4:assert(0);break;
 		case 5:assert(0);break;
 		case 6:return push_m_v(eip);break;

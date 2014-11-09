@@ -2,9 +2,9 @@
 
 
 int main() {
-	unsigned int c=3,d=4;
-	c=c*d;
-	nemu_assert(c==12);
+	int c=3;
+	c++;
+	nemu_assert(c==4);
 
 	HIT_GOOD_TRAP;
 

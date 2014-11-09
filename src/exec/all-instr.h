@@ -32,3 +32,5 @@
 #include "arith/idiv.h"
 #include "arith/neg.h"
 #include "arith/not.h"
+#include "arith/dec.h"
+#include "arith/inc.h"

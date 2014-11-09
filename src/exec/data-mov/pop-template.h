@@ -11,7 +11,7 @@ make_helper(concat(leave_,SUFFIX)) {
 }
 make_helper(concat(pop_r_,SUFFIX)) {
 	int8_t opc=instr_fetch(eip,1);
-	int8_t mask_op=0xf;
+	int8_t mask_op=0x7;
 	REG(opc&mask_op)=MEM_R(reg_l(4));
 	reg_l(4)+=DATA_BYTE;
 	print_asm("pop" str(SUFFIX) " %%%s",REG_NAME(opc&mask_op));
