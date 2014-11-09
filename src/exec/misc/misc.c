@@ -1,7 +1,7 @@
 #include "exec/helper.h"
 #include "ui/breakpoint.h"
 #include "ui/ui.h"
-
+#include "cpu/reg.h"
 #include "nemu.h"
 
 make_helper(inv) {
@@ -22,11 +22,11 @@ make_helper(int3) {/*参数是swaddr_t int3*/
 	printf("break point hit\n");
 	printf("%x\n",eip);
 	swaddr_write(eip,1,find_pre_inc(eip));
-/*	for(i=0;i<NR_BP-1;i++){
+	/*	for(i=0;i<NR_BP-1;i++){
 		if(bp_pool[i].addr==eip){
-			break;
+		break;
 		}
-	}*/
+		}*/
 	return 1;
 }
 
@@ -37,3 +37,4 @@ make_helper(nemu_trap) {
 	print_asm("nemu trap");
 	return 1;
 }
+

@@ -155,6 +155,7 @@ static void cmd_info_reg(){
 	printf("esi            0x%x            %d\n",cpu.esi,cpu.esi);
 	printf("edi            0x%x            %d\n",cpu.edi,cpu.edi);
 	printf("eip            0x%x            %d\n",cpu.eip,cpu.eip);
+	printf("EFLAGS		   0x%x		    	%d\n",cpu.EFLAGS.val,cpu.EFLAGS.val);
 
 }
 

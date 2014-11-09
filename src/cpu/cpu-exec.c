@@ -7,6 +7,7 @@
 #define LOADER_START 0x100000
 
 int exec(swaddr_t);
+int exec2(swaddr_t);
 void load_prog();
 void init_dram();
 
@@ -24,6 +25,9 @@ void restart() {
 	memcpy(hwa_to_va(LOADER_START), loader, loader_len);
 
 	cpu.eip = LOADER_START;
+	cpu.ebp = 0;
+	cpu.esp = 0x800000;
+	cpu.EFLAGS.val = 0x2;
 
 	init_dram();
 	reload();//重新载入断点
@@ -45,7 +49,6 @@ void cpu_exec(volatile uint32_t n) {
 	for(; n > 0; n --) {
 		swaddr_t eip_temp = cpu.eip;
 		int instr_len = exec(cpu.eip);
-
 		cpu.eip += instr_len;
 		if(n_temp != -1 || (enable_debug && !quiet)) {
 			print_bin_instr(eip_temp, instr_len);
