@@ -15,6 +15,7 @@
 #include "logic/or.h"
 #include "logic/and.h"
 #include "logic/xor.h"
+#include "logic/shift.h"
 
 #include "transfer/jcc.h"
 #include "transfer/jmp.h"

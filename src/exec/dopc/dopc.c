@@ -60,6 +60,114 @@ make_helper(dopc83) {
 				 }
 	}
 }
+make_helper(dopcc0) {
+	ModR_M m;
+	m.val=instr_fetch(eip+1,1);
+	switch (m.opcode){
+		//case 0: assert(0);break;
+		//case 1: assert(0);break;
+		//case 2: assert(0);break;
+		//case 3: assert(0);break;
+		case 4: return shl_i_b(eip);break;
+		case 5: return shr_i_b(eip);break;
+		//case 6: assert(0);break;
+		case 7: return sar_i_b(eip);break;
+		default :{
+					 printf("dopcode error\n");
+					 assert(0);
+				 }
+	}
+}
+make_helper(dopcc1) {
+	ModR_M m;
+	m.val=instr_fetch(eip+1,1);
+	switch (m.opcode){
+		//case 0: assert(0);break;
+		//case 1: assert(0);break;
+		//case 2: assert(0);break;
+		//case 3: assert(0);break;
+		case 4: return shl_i_v(eip);break;
+		case 5: return shr_i_v(eip);break;
+		//case 6: assert(0);break;
+		case 7: return sar_i_v(eip);break;
+		default :{
+					 printf("dopcode error\n");
+					 assert(0);
+				 }
+	}
+}
+make_helper(dopcd0) {
+	ModR_M m;
+	m.val=instr_fetch(eip+1,1);
+	switch (m.opcode){
+		//case 0: assert(0);break;
+		//case 1: assert(0);break;
+		//case 2: assert(0);break;
+		//case 3: assert(0);break;
+		case 4: return shl_1_b(eip);break;
+		case 5: return shr_1_b(eip);break;
+		//case 6: assert(0);break;
+		case 7: return sar_1_b(eip);break;
+		default :{
+					 printf("dopcode error\n");
+					 assert(0);
+				 }
+	}
+}
+make_helper(dopcd1) {
+	ModR_M m;
+	m.val=instr_fetch(eip+1,1);
+	switch (m.opcode){
+		//case 0: assert(0);break;
+		//case 1: assert(0);break;
+		//case 2: assert(0);break;
+		//case 3: assert(0);break;
+		case 4: return shl_1_v(eip);break;
+		case 5: return shr_1_v(eip);break;
+		//case 6: assert(0);break;
+		case 7: return sar_1_v(eip);break;
+		default :{
+					 printf("dopcode error\n");
+					 assert(0);
+				 }
+	}
+}
+make_helper(dopcd2) {
+	ModR_M m;
+	m.val=instr_fetch(eip+1,1);
+	switch (m.opcode){
+		//case 0: assert(0);break;
+		//case 1: assert(0);break;
+		//case 2: assert(0);break;
+		//case 3: assert(0);break;
+		case 4: return shl_c_b(eip);break;
+		case 5: return shr_c_b(eip);break;
+		//case 6: assert(0);break;
+		case 7: return sar_c_b(eip);break;
+		default :{
+					 printf("dopcode error\n");
+					 assert(0);
+				 }
+	}
+}
+make_helper(dopcd3) {
+	ModR_M m;
+	m.val=instr_fetch(eip+1,1);
+	switch (m.opcode){
+		//case 0: assert(0);break;
+		//case 1: assert(0);break;
+		//case 2: assert(0);break;
+		//case 3: assert(0);break;
+		case 4: return shl_c_v(eip);break;
+		case 5: return shr_c_v(eip);break;
+		//case 6: assert(0);break;
+		case 7: return sar_c_v(eip);break;
+		default :{
+					 printf("dopcode error\n");
+					 assert(0);
+				 }
+	}
+}
 make_helper(dopcff) {
 	ModR_M m;
 	m.val=instr_fetch(eip+1,1);
