@@ -24,7 +24,7 @@ make_helper(concat(idiv_rm2r_,SUFFIX)){
 		tmp3=tmp1%tmp2;
 		tmp1/=tmp2;
 		REG(0)=tmp1;
-		REG(4)=tmp3;
+		REG(2)=tmp3;
 		print_asm("idiv" str(SUFFIX) " %%%s,%%%s", REG_NAME(m.R_M), REG_NAME(0));
 		return 1+1;
 	}
@@ -49,7 +49,7 @@ make_helper(concat(idiv_rm2r_,SUFFIX)){
 		tmp3=tmp1%tmp2;
 		tmp1/=tmp2;
 		REG(0)=tmp1;
-		REG(4)=tmp3;
+		REG(2)=tmp3;
 		print_asm("idiv" str(SUFFIX) " %s,%%%s",ModR_M_asm, REG_NAME(0));
 		return 1+len;
 	}

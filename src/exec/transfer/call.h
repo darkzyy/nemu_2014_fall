@@ -4,7 +4,10 @@
 make_helper(call_rel_b);
 
 make_helper(call_rel_v);
+make_helper(call_rm_v);
 make_helper(ret_n_l);
 make_helper(ret_n_w);
+make_helper(ret_ni_l);
+make_helper(ret_ni_w);
 
 #endif

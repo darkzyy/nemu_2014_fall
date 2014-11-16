@@ -186,7 +186,8 @@ make_helper(dopcff) {
 	switch (m.opcode){
 		case 0:return inc_rm_v(eip);break;
 		case 1:return dec_rm_v(eip);break;
-		case 4:assert(0);break;
+		case 2:return call_rm_v(eip);break;
+		case 4:return jmp_rm_v(eip);break;
 		case 5:assert(0);break;
 		case 6:return push_m_v(eip);break;
 		default :{

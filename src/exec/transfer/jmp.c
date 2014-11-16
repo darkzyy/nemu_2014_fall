@@ -17,3 +17,6 @@ extern char suffix;
 make_helper(jmp_rel_v) {
 	return (suffix == 'l' ? jmp_rel_l(eip) : jmp_rel_w(eip));
 }
+make_helper(jmp_rm_v) {
+	return (suffix == 'l' ? jmp_rm_l(eip) : jmp_rm_w(eip));
+}

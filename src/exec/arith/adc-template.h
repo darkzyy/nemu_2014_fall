@@ -54,9 +54,10 @@ make_helper(concat(adc_r2rm_,SUFFIX)) {
 	ModR_M m;
 	m.val =instr_fetch(eip+1,1);
 	if(m.mod ==3 ) {
+		DATA_TYPE tmp=REG(m.R_M) + REG(m.reg)+carry;
 		flag_of(REG(m.R_M),REG(m.reg)+carry,'+',DATA_BYTE);
 		flag_cf(REG(m.R_M),REG(m.reg)+carry,'+',DATA_BYTE);
-		REG(m.R_M)=REG(m.R_M) + REG(m.reg)+carry;
+		REG(m.R_M)=tmp;
 		flag_sf(REG(m.R_M),DATA_BYTE);
 		flag_zf(REG(m.R_M),DATA_BYTE);
 		flag_pf(REG(m.R_M));
@@ -86,9 +87,9 @@ make_helper(concat(adc_rm2r_,SUFFIX) ) {
 	m.val = instr_fetch(eip+1,1);
 	if(m.mod ==3 ) {
 		DATA_TYPE tmp;
+		tmp=REG(m.reg)+REG(m.R_M)+carry;
 		flag_of(REG(m.reg),REG(m.R_M)+carry,'+',DATA_BYTE);
 		flag_cf(REG(m.reg),REG(m.R_M)+carry,'+',DATA_BYTE);
-		tmp=REG(m.reg)+REG(m.R_M)+carry;
 		REG(m.reg)=tmp;
 		flag_sf(tmp,DATA_BYTE);
 		flag_zf(tmp,DATA_BYTE);

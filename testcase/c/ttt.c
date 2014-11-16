@@ -2,10 +2,8 @@
 
 
 int main() {
-	int c=3;
-	c++;
-	nemu_assert(c==4);
-
+	int a=4,b=3;
+	nemu_assert(a%b==1);
 	HIT_GOOD_TRAP;
 
 	return 0;

@@ -1,8 +1,8 @@
-#ifndef __IDIV_H__
-#define __IDIV_H__
+#ifndef __DIV_H__
+#define __DIV_H__
 
-make_helper(idiv_rm2r_b);
+make_helper(div_rm2r_b);
 
-make_helper(idiv_rm2r_v);
+make_helper(div_rm2r_v);
 
 #endif

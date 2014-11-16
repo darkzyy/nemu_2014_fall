@@ -4,11 +4,14 @@
 
 #include "data-mov/mov.h"
 #include "data-mov/movzx.h"
+#include "data-mov/movsx.h"
 #include "data-mov/push.h"
 #include "data-mov/pop.h"
+#include "data-mov/xchg.h"
 
 #include "misc/misc.h"
 #include "misc/lea.h"
+#include "misc/dataext.h"
 
 
 #include "logic/test.h"
@@ -34,3 +37,8 @@
 #include "arith/not.h"
 #include "arith/dec.h"
 #include "arith/inc.h"
+
+#include "flagctrl/fc.h"
+
+#include "scti/movs.h"
+#include "scti/rep.h"

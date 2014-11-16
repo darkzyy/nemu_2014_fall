@@ -62,8 +62,8 @@ make_helper(concat(imul_rm2r_,SUFFIX)){
 			cpu.EFLAGS.CF=1;
 			cpu.EFLAGS.OF=1;
 		}
-		return 1+len;
 		print_asm("imul" str(SUFFIX) " %s,%%%s",ModR_M_asm, REG_NAME(0));
+		return 1+len;
 	}
 }
 make_helper(concat(imul_rm2re_,SUFFIX)){
