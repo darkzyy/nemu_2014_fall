@@ -21,15 +21,15 @@
 
 #define HIT_GOOD_TRAP \
 	movl $0, %eax; \
-	.byte 0x82
+.byte 0x82
 
 #define HIT_BAD_TRAP \
 	movl $1, %eax; \
-	.byte 0x82
+.byte 0x82
 
 #define nemu_assert(reg, val) \
 	cmp $val, %reg; \
-	je concat(label,__LINE__); HIT_BAD_TRAP; concat(label,__LINE__):
+je concat(label,__LINE__); HIT_BAD_TRAP; concat(label,__LINE__):
 
 #endif
 

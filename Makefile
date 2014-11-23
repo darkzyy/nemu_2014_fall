@@ -5,7 +5,7 @@
 # setting compiler and compile options
 CC      = gcc
 LD      = ld
-CFLAGS  = -ggdb -MD -Wall -Wno-unused-result -Werror -fno-strict-aliasing -I./include -O2
+CFLAGS  = -ggdb -MD -Wall -Wno-unused-result -Werror -fno-strict-aliasing -I./include -O2 
 
 # jyy always knows what you have done (*^__^*)
 GITFLAGS = -q --author='jyy <njujiangyy@gmail.com>' --no-verify --allow-empty
@@ -15,13 +15,13 @@ CFILES  = $(shell find src/ -name "*.c")
 OBJS    = $(CFILES:.c=.o)
 
 # test files
-TESTFILE = testcase/c/struct
+TESTFILE = testcase/c/shuixianhua
 C_TEST_FILE_LIST = $(shell find testcase/c/ -name "*.c")
 S_TEST_FILE_LIST = $(shell find testcase/asm/ -name "*.S")
 TEST_FILE_LIST = $(C_TEST_FILE_LIST:.c=) $(S_TEST_FILE_LIST:.S=)
 
 nemu: $(OBJS)
-	$(CC) -o nemu $(OBJS) $(CFLAGS) -lreadline
+	$(CC) -o nemu $(OBJS) $(CFLAGS) -lreadline 
 	-@git add -A --ignore-errors # KEEP IT
 	-@while (test -e .git/index.lock); do sleep 0.1; done # KEEP IT
 	-@(echo "> compile" && uname -a && uptime && pstree -A) | git commit -F - $(GITFLAGS) # KEEP IT
@@ -29,8 +29,12 @@ nemu: $(OBJS)
 $(TEST_FILE_LIST):
 	cd `dirname $@` && make
 
-loader: $(TESTFILE)
-	objcopy -S -O binary $(TESTFILE) loader
+#loader: $(TESTFILE)
+#	objcopy -S -O binary $(TESTFILE) loader
+LOADER_DIR = myloader2
+loader:
+	cd $(LOADER_DIR)&&make
+	objcopy -S -O binary $(LOADER_DIR)/loader loader
 	xxd -i loader >src/elf/loader.c
 	rm loader
 

@@ -19,6 +19,7 @@ make_helper(concat(call_rm_,SUFFIX)) {
 		reg_l(4)-=DATA_BYTE;
 		MEM_W(reg_l(4),eip+1+1);
 		print_asm("call" "0x%x",eip+1+1+tmp);
+		cpu.eip=tmp-2;
 		return 1+1;
 	}
 	else{
@@ -28,6 +29,7 @@ make_helper(concat(call_rm_,SUFFIX)) {
 		reg_l(4)-=DATA_BYTE;
 		MEM_W(reg_l(4),eip+1+len);
 		print_asm("call" "0x%x",eip+1+len+tmp);
+		cpu.eip=tmp-1-len;
 		return 1+len;
 	}
 }

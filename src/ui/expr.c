@@ -8,11 +8,12 @@
 #include <regex.h>
 
 enum {
-	NOTYPE = 256, plus='+', min='-', time='*', div='/',mod='%', l='(', r=')',EQ=0,NEQ,LESS,MORE,LESSEQ,MOREEQ, NUM, HNUM,REG,OR,AND,BOR,BXOR,BAND,LSFT,RSFT,BN,BANG,DEREF,NEG
+	NOTYPE = 256, plus='+', min='-', time='*', div='/',mod='%', l='(', r=')',EQ=0,NEQ,LESS,MORE,LESSEQ,MOREEQ, NUM, HNUM,REG,OR,AND,BOR,BXOR,BAND,LSFT,RSFT,BN,BANG,DEREF,NEG,SYMBOL
 	/* TODO: Add more token types */
 
 };
 
+//extern int match_sym(char*sym);
 static struct rule {
 	char *regex;
 	int token_type;
@@ -46,7 +47,8 @@ static struct rule {
 	{"\\|",BOR},
 	{"\\%",'%'},
 	{"\\~",BN},
-	{"\\!",BANG}					//25
+	{"\\!",BANG},					//25
+	{"[[a-zA-Z][:digit:]_]+",SYMBOL}
 
 };
 
@@ -116,6 +118,14 @@ static bool make_token(char *e) {
 							}
 							tokens[nr_token].str[j]='\0';
 							tokens[nr_token].type=NUM;
+							nr_token++;
+							break;
+					case SYMBOL: 
+							for(j=0;j<substr_len;j++){
+								tokens[nr_token].str[j]=substr_start[j];
+							}
+							tokens[nr_token].str[j]='\0';
+							tokens[nr_token].type=SYMBOL;
 							nr_token++;
 							break;
 					case DEREF: 
@@ -349,7 +359,7 @@ static int domin_op(int p,int q){
 			a[i]=stage+9;
 		else if(tokens[i].type =='*'||tokens[i].type =='/'||tokens[i].type =='%')
 			a[i]=stage+10;
-		else if(tokens[i].type ==NEG||tokens[i].type ==BN||tokens[i].type ==BANG||tokens[i].type ==DEREF)
+		else if(tokens[i].type ==NEG||tokens[i].type ==BN||tokens[i].type ==BANG||tokens[i].type ==DEREF||tokens[i].type==SYMBOL)
 			a[i]=stage+11;
 		else if(tokens[i].type == LSFT||tokens[i].type == RSFT)
 			a[i]=stage+8;
@@ -444,6 +454,7 @@ static int eval(int p,int q){
 			case BANG:return !val2;
 			case BN:return ~val2;
 			case DEREF:return swaddr_read(val2,1);
+	//		case SYMBOL:return match_sym(tokens[op-1].str);
 			default:assert(0);
 		}
 	}

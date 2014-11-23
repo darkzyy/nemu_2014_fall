@@ -205,7 +205,7 @@ make_helper(dopcf6) {
 		case 4:return mul_rm2r_b(eip);break;
 		case 5:return imul_rm2r_b(eip);break;
 		case 6:return div_rm2r_b(eip);break;
-		case 7:return idiv_rm2r_v(eip);break;
+		case 7:return idiv_rm2r_b(eip);break;
 		default :{
 					 printf("dopcode error\n");
 					 assert(0);
@@ -219,7 +219,7 @@ make_helper(dopcf7) {
 		case 2:return neg_v(eip);break;
 		case 3:return neg_v(eip);break;
 		case 4:return mul_rm2r_v(eip);break;
-		case 5:return imul_rm2r_b(eip);break;
+		case 5:return imul_rm2r_v(eip);break;
 		case 6:return div_rm2r_v(eip);break;
 		case 7:return idiv_rm2r_v(eip);break;
 		default :{

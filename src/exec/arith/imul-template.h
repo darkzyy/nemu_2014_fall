@@ -16,7 +16,7 @@ make_helper(concat(imul_rm2r_,SUFFIX)){
 		tmp2=tmp2_;
 		tmp1*=tmp2;
 		if(DATA_BYTE==1){
-			reg_w(0)=tmp1;
+			reg_w(0)=(int16_t)tmp1;//????
 		}
 		else{
 			REG(0)=tmp1&mask;
@@ -125,8 +125,14 @@ make_helper(concat(imul_i82rm_,SUFFIX)) {
 		int64_t tmp1,tmp2,tmp3;
 		tmp1=REG(m.R_M);
 		tmp2=instr_fetch(eip+1+1,1);
+		//printf("tmp1:0x%llx\n",tmp1);
+		//printf("tmp2:0x%llx\n",tmp2);
 		tmp1*=tmp2;
-		REG(m.reg)=tmp1;
+		//printf("tmp1:0x%llx\n",tmp1);
+		DATA_TYPE_S tttt=tmp1;
+		//printf("tttt:0x%x\n",tttt);
+		REG(m.reg)=tttt;
+		//printf("eax:0x%x\n",REG(m.reg));
 		DATA_TYPE_S tmp_,tmp2_;
 		tmp_=tmp1;
 		tmp3=tmp_;

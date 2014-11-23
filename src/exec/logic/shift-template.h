@@ -16,7 +16,7 @@ make_helper(concat(shl_1_,SUFFIX)) {
 		flag_sf(tmp,DATA_BYTE);
 		flag_zf(tmp,DATA_BYTE);
 		flag_pf(tmp);
-		print_asm("shl" str(SUFFIX) " $0x1,%%%s",REG_NAME(m.reg));
+		print_asm("shl" str(SUFFIX) " $0x1,%%%s",REG_NAME(m.R_M));
 		return 1+1;
 	}
 	else{
@@ -46,7 +46,7 @@ make_helper(concat(shl_c_,SUFFIX)) {
 		flag_sf(tmp,DATA_BYTE);
 		flag_zf(tmp,DATA_BYTE);
 		flag_pf(tmp);
-		print_asm("shl" str(SUFFIX) " %%cl,%%%s",REG_NAME(m.reg));
+		print_asm("shl" str(SUFFIX) " %%cl,%%%s",REG_NAME(m.R_M));
 		return 1+1;
 	}
 	else{
@@ -77,7 +77,7 @@ make_helper(concat(shl_i_,SUFFIX)) {
 		flag_sf(tmp,DATA_BYTE);
 		flag_zf(tmp,DATA_BYTE);
 		flag_pf(tmp);
-		print_asm("shl" str(SUFFIX) " $0x%x,%%%s",imm,REG_NAME(m.reg));
+		print_asm("shl" str(SUFFIX) " $0x%x,%%%s",imm,REG_NAME(m.R_M));
 		return 1+1+1;
 	}
 	else{
@@ -108,7 +108,7 @@ make_helper(concat(shr_1_,SUFFIX)) {
 		flag_sf(tmp,DATA_BYTE);
 		flag_zf(tmp,DATA_BYTE);
 		flag_pf(tmp);
-		print_asm("shr" str(SUFFIX) " $0x1,%%%s",REG_NAME(m.reg));
+		print_asm("shr" str(SUFFIX) " $0x1,%%%s",REG_NAME(m.R_M));
 		return 1+1;
 	}
 	else{
@@ -138,7 +138,7 @@ make_helper(concat(shr_c_,SUFFIX)) {
 		flag_sf(tmp,DATA_BYTE);
 		flag_zf(tmp,DATA_BYTE);
 		flag_pf(tmp);
-		print_asm("shr" str(SUFFIX) " %%cl,%%%s",REG_NAME(m.reg));
+		print_asm("shr" str(SUFFIX) " %%cl,%%%s",REG_NAME(m.R_M));
 		return 1+1;
 	}
 	else{
@@ -169,7 +169,7 @@ make_helper(concat(shr_i_,SUFFIX)) {
 		flag_sf(tmp,DATA_BYTE);
 		flag_zf(tmp,DATA_BYTE);
 		flag_pf(tmp);
-		print_asm("shr" str(SUFFIX) " $0x%x,%%%s",imm,REG_NAME(m.reg));
+		print_asm("shr" str(SUFFIX) " $0x%x,%%%s",imm,REG_NAME(m.R_M));
 		return 1+1+1;
 	}
 	else{
@@ -200,7 +200,7 @@ make_helper(concat(sar_1_,SUFFIX)) {
 		flag_sf(tmp,DATA_BYTE);
 		flag_zf(tmp,DATA_BYTE);
 		flag_pf(tmp);
-		print_asm("sar" str(SUFFIX) " $0x1,%%%s",REG_NAME(m.reg));
+		print_asm("sar" str(SUFFIX) " $0x1,%%%s",REG_NAME(m.R_M));
 		return 1+1;
 	}
 	else{
@@ -230,7 +230,7 @@ make_helper(concat(sar_c_,SUFFIX)) {
 		flag_sf(tmp,DATA_BYTE);
 		flag_zf(tmp,DATA_BYTE);
 		flag_pf(tmp);
-		print_asm("sar" str(SUFFIX) " %%cl,%%%s",REG_NAME(m.reg));
+		print_asm("sar" str(SUFFIX) " %%cl,%%%s",REG_NAME(m.R_M));
 		return 1+1;
 	}
 	else{
@@ -261,7 +261,7 @@ make_helper(concat(sar_i_,SUFFIX)) {
 		flag_sf(tmp,DATA_BYTE);
 		flag_zf(tmp,DATA_BYTE);
 		flag_pf(tmp);
-		print_asm("sar" str(SUFFIX) " $0x%x,%%%s",imm,REG_NAME(m.reg));
+		print_asm("sar" str(SUFFIX) " $0x%x,%%%s",imm,REG_NAME(m.R_M));
 		return 1+1+1;
 	}
 	else{
