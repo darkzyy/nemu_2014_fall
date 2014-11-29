@@ -19,6 +19,14 @@ make_helper(concat(push_m_,SUFFIX)) {
 	print_asm("push" str(SUFFIX) " %s",ModR_M_asm);
 	return 1+len;
 }
+make_helper(concat(push_i_,SUFFIX)) {
+	DATA_TYPE imm;
+	imm = instr_fetch(eip+1,DATA_BYTE);
+	reg_l(4)-=4;
+	MEM_W(reg_l(4),imm);
+	print_asm("push" str(SUFFIX) " $0x%x",imm);
+	return 1+DATA_BYTE;
+}
 
 
 #include "exec/template-end.h"

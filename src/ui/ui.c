@@ -159,6 +159,7 @@ static void cmd_info_reg(){
 
 }
 
+extern void cmd_bt();
 
 void main_loop() {
 	char *cmd;
@@ -224,6 +225,7 @@ void main_loop() {
 		else if(strcmp(p,"d")==0)   {cmd_d(p);}
 		else if(strcmp(p,"p")==0)	{cmd_p(p);}
 		else if(strcmp(p,"w")==0)	{cmd_w(p);}
+		else if(strcmp(p,"bt")==0)	{cmd_bt();}
 
 
 

@@ -1,6 +1,8 @@
 #include "memory.h"
+#include "cpu/reg.h"
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <elf.h>
 #include <sys/stat.h>
 
@@ -100,5 +102,50 @@ void load_prog() {
 	 */
 	fread(hwa_to_va(0), st.st_size, 1, fp);
 	fclose(fp);
+}
+int match_sym(char*sym) {
+	int i=0;
+	while(i<nr_symtab_entry){
+		if(symtab[i].st_info==0x11||symtab[i].st_info==0x12){
+			if(strcmp(strtab+symtab[i].st_name,sym)==0)
+				return symtab[i].st_value;
+			//printf("%d\n",i);
+			//assert(0);
+		}
+		i++;
+	}
+	return 0;
+}
+
+extern bool find_func_name(swaddr_t addr,char ** func_name);
+
+void cmd_bt(){
+	swaddr_t addr=cpu.eip;
+	swaddr_t ebp=cpu.ebp;
+	bool find_suc=1;
+	char* func_name=NULL;
+	find_suc=find_func_name(addr,&func_name);
+	do{
+		printf("func:%s,addr:0x%x,ebp:0x%x,suc:%d\n",func_name,addr,ebp,find_suc);
+		addr=swaddr_read(ebp+4,4);
+		ebp=swaddr_read(ebp,4);
+		find_suc=find_func_name(addr,&func_name);
+	}while(find_suc);
+}
+
+bool find_func_name(swaddr_t addr,char ** func_name){
+	int i=0;
+	while(i<nr_symtab_entry){
+		if(symtab[i].st_info==0x12){
+			//assert(0);
+			if(symtab[i].st_value<=addr&&(symtab[i].st_value+symtab[i].st_size)>addr){
+				//printf("%s\n",strtab+symtab[i].st_name);
+				*func_name=strtab+symtab[i].st_name;
+				return 1;
+			}
+		}
+		i++;
+	}
+	return 0;
 }
 

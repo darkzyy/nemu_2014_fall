@@ -5,7 +5,7 @@
 # setting compiler and compile options
 CC      = gcc
 LD      = ld
-CFLAGS  = -ggdb -MD -Wall -Wno-unused-result -Werror -fno-strict-aliasing -I./include -O2 
+CFLAGS  = -ggdb -MD -Wall -Wno-unused-result -Werror -fno-strict-aliasing -I./include -O2 -m32 
 
 # jyy always knows what you have done (*^__^*)
 GITFLAGS = -q --author='jyy <njujiangyy@gmail.com>' --no-verify --allow-empty
@@ -15,7 +15,7 @@ CFILES  = $(shell find src/ -name "*.c")
 OBJS    = $(CFILES:.c=.o)
 
 # test files
-TESTFILE = testcase/c/shuixianhua
+TESTFILE = testcase/c/fact
 C_TEST_FILE_LIST = $(shell find testcase/c/ -name "*.c")
 S_TEST_FILE_LIST = $(shell find testcase/asm/ -name "*.S")
 TEST_FILE_LIST = $(C_TEST_FILE_LIST:.c=) $(S_TEST_FILE_LIST:.S=)
@@ -31,7 +31,7 @@ $(TEST_FILE_LIST):
 
 #loader: $(TESTFILE)
 #	objcopy -S -O binary $(TESTFILE) loader
-LOADER_DIR = myloader2
+LOADER_DIR = myloader
 loader:
 	cd $(LOADER_DIR)&&make
 	objcopy -S -O binary $(LOADER_DIR)/loader loader

@@ -1,5 +1,8 @@
 #include "exec/helper.h"
 
+#define DATA_BYTE 1
+#include "push-template.h"
+#undef DATA_BYTE
 
 #define DATA_BYTE 2
 #include "push-template.h"
@@ -16,4 +19,7 @@ make_helper(push_r_v) {
 }
 make_helper(push_m_v) {
 	return(suffix == 'l' ? push_m_l(eip) : push_m_w(eip));
+}
+make_helper(push_i_v) {
+	return(suffix == 'l' ? push_i_l(eip) : push_i_w(eip));
 }

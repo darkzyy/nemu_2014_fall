@@ -94,6 +94,7 @@ make_helper(concat(sbb_rm2r_,SUFFIX) ) {
 		flag_of(REG(m.reg),tmp2,'-',DATA_BYTE);
 		flag_cf(REG(m.reg),tmp2,'-',DATA_BYTE);
 		tmp=REG(m.reg)-tmp2;
+		REG(m.reg)=tmp;
 		flag_sf(tmp,DATA_BYTE);
 		flag_zf(tmp,DATA_BYTE);
 		flag_pf(tmp);
@@ -109,6 +110,7 @@ make_helper(concat(sbb_rm2r_,SUFFIX) ) {
 		flag_of(tmp2,tmp1,'-',DATA_BYTE);
 		flag_cf(tmp2,tmp1,'-',DATA_BYTE);
 		tmp2-=tmp1;
+		REG(m.reg)=tmp2;
 		flag_sf(tmp2,DATA_BYTE);
 		flag_zf(tmp2,DATA_BYTE);
 		flag_pf(tmp2);
