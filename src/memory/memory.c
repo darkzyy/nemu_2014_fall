@@ -25,12 +25,12 @@ void swaddr_write(swaddr_t addr, size_t len, uint32_t data) {
 	hwaddr_write(addr, len, data);
 }
 
-static uint32_t hwaddr_read_instr(hwaddr_t addr, size_t len) {
+/*static uint32_t hwaddr_read_instr(hwaddr_t addr, size_t len) {
 	assert(len == 1 || len == 2 || len == 4);
 	return dram_read(addr, len);
-}
+}*/
 
 uint32_t instr_fetch(swaddr_t addr, size_t len) {
 	assert(len == 1 || len == 2 || len == 4);
-	return hwaddr_read_instr(addr, len);
+	return swaddr_read(addr, len);
 }
