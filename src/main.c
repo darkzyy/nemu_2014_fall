@@ -9,6 +9,7 @@ void init_bp_pool();
 void init_regex();
 void init_signal();
 void reg_test();
+extern void init_cache1();
 
 int enable_debug = false;
 int quiet = false;
@@ -40,8 +41,9 @@ int main(int argc, char *argv[]) {
 	/* Perform some global initialization */
 	init_regex();
 	init_signal();
-	init_bp_pool();
+	init_cache1();
 	load_table();
+	init_bp_pool();
 
 
 	/* Test whether the 'CPU_state' structure is organized correctly. */
