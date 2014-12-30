@@ -56,7 +56,7 @@ static void cmd_c() {
 		return;
 	}
 	if(nemu_state!=BPS2)
-		nemu_state = RUNNING;
+	  nemu_state = RUNNING;
 	cpu_exec(-1);
 	if(nemu_state != END&&nemu_state !=BPS2) { nemu_state = STOP; }
 }
@@ -91,19 +91,19 @@ static void cmd_si(unsigned int a){
 	if(nemu_state != END&&nemu_state !=BPS2) { nemu_state = STOP; }
 }
 static void cmd_b(char *p){
-		p=strtok(NULL,"");
-		if(p==NULL){printf("Unknown command 'b NULL'\n"); }
-		else if(p[0]!='*'){printf("Unknown command\n"); }
-		else{
-			bool suc=1;
-			swaddr_t a=expr(p+1,&suc);
-			//sscanf(p,"%x",&a);
-			if(suc){
-				add_bp(a,swaddr_read(a,1));
-				swaddr_write(a,1,0xcc);
-			}
+	p=strtok(NULL,"");
+	if(p==NULL){printf("Unknown command 'b NULL'\n"); }
+	else if(p[0]!='*'){printf("Unknown command\n"); }
+	else{
+		bool suc=1;
+		swaddr_t a=expr(p+1,&suc);
+		//sscanf(p,"%x",&a);
+		if(suc){
+			add_bp(a,swaddr_read(a,1));
+			swaddr_write(a,1,0xcc);
 		}
-		
+	}
+
 }
 static void cmd_d(char *p){
 	p=strtok(NULL," ");
@@ -143,19 +143,26 @@ static void cmd_info_b(){
 
 static void cmd_info_reg(){
 	if(nemu_state == END) {
-        puts("The Program does not start. Use 'r' command to start the program.");
-        return;
+		puts("The Program does not start. Use 'r' command to start the program.");
+		return;
 	}
-	printf("eax            0x%x            %d\n",cpu.eax,cpu.eax);
-	printf("ecx            0x%x            %d\n",cpu.ecx,cpu.ecx);
-	printf("edx            0x%x            %d\n",cpu.edx,cpu.edx);
-	printf("ebx            0x%x            %d\n",cpu.ebx,cpu.ebx);
-	printf("esp            0x%x            %d\n",cpu.esp,cpu.esp);
-	printf("ebp            0x%x            %d\n",cpu.ebp,cpu.ebp);
-	printf("esi            0x%x            %d\n",cpu.esi,cpu.esi);
-	printf("edi            0x%x            %d\n",cpu.edi,cpu.edi);
-	printf("eip            0x%x            %d\n",cpu.eip,cpu.eip);
-	printf("EFLAGS		   0x%x		    	%d\n",cpu.EFLAGS.val,cpu.EFLAGS.val);
+	printf("eax				0x%x				%d\n",cpu.eax,cpu.eax);
+	printf("ecx				0x%x				%d\n",cpu.ecx,cpu.ecx);
+	printf("edx				0x%x				%d\n",cpu.edx,cpu.edx);
+	printf("ebx				0x%x				%d\n",cpu.ebx,cpu.ebx);
+	printf("esp				0x%x				%d\n",cpu.esp,cpu.esp);
+	printf("ebp				0x%x				%d\n",cpu.ebp,cpu.ebp);
+	printf("esi				0x%x				%d\n",cpu.esi,cpu.esi);
+	printf("edi				0x%x				%d\n",cpu.edi,cpu.edi);
+	printf("eip				0x%x				%d\n",cpu.eip,cpu.eip);
+	printf("EFLAGS				0x%x				%d\n",cpu.EFLAGS.val,cpu.EFLAGS.val);
+	printf("CR0				0x%x				%d\n",cpu.CR0.val,cpu.CR0.val);
+	printf("CR3				0x%x				%d\n",cpu.CR3,cpu.CR3);
+	printf("ES              0x%x                %d\n",cpu.ES.selector,cpu.ES.selector);
+	printf("CS              0x%x                %d\n",cpu.CS.selector,cpu.CS.selector);
+	printf("SS              0x%x                %d\n",cpu.SS.selector,cpu.SS.selector);
+	printf("DS              0x%x                %d\n",cpu.DS.selector,cpu.DS.selector);
+	printf("GDTR            base:  0x%x              lim:  0x%x\n",cpu.GDTR.base,cpu.GDTR.lim);
 
 }
 
@@ -175,12 +182,12 @@ void main_loop() {
 		else if(strcmp(p,"si") == 0) {
 			p =strtok(NULL," ");
 			if(p!=NULL){
-		   		unsigned int a=0;
+				unsigned int a=0;
 				sscanf(p,"%u",&a);
 				cmd_si(a);
 			}
 			else cmd_si(1);
-	   	}
+		}
 		else if(strcmp(p,"info") == 0) {
 			p = strtok(NULL," ");
 			if(p ==NULL){ 
@@ -195,29 +202,31 @@ void main_loop() {
 				}
 				else printf("Unknown command 'info %s'\n",p);
 			}
-	   	}
+		}
 		else if(strcmp(p,"x")==0){
 			p = strtok(NULL," ");
-		    unsigned int a=0;
-  			if(p ==NULL){ printf("Unknown command 'x %s'\n",p); }
-		    else{
+			unsigned int a=0;
+			if(p ==NULL){ printf("Unknown command 'x %s'\n",p); }
+			else{
 				sscanf(p,"%u",&a);
 				p= strtok(NULL,"");
 				if(p ==NULL){ printf("Unknown command\n"); }
 				else{
 					bool suc=1;
-			  		 uint32_t b=expr(p,&suc);
-					 if(suc){
-					 	//sscanf(p,"%x",&b);
-						 int i=0;
-						 while(i<a)
-						 {
-							printf("%02x ", swaddr_read(b + i, 1));
-						    i++;
-						 	if(i%5 == 0)
-								 printf("\n");
-			   			 }
-					 }
+					uint32_t b=expr(p,&suc);
+					if(suc){
+						//sscanf(p,"%x",&b);
+						int i=0;
+						while(i<a)
+						{
+							printf("	%02x ", swaddr_read(b + i, 1));
+							i++;
+							if(i%4 == 0){
+								printf("	 0x%x",swaddr_read(b + i -4 ,4));
+								printf("\n");
+							}
+						}
+					}
 				}
 			}
 		}
@@ -229,10 +238,10 @@ void main_loop() {
 
 
 
-			 
 
 
-			
+
+
 		/* TODO: Add more commands */
 
 		else { printf("Unknown command '%s'\n", p); }

@@ -11,12 +11,23 @@
  * For more details about the GPR encoding scheme, see i386 manual.
  */
 
+typedef struct seg_reg {
+	uint16_t selector;
+	uint32_t lim;
+	uint32_t base;
+	uint8_t CPL;
+}seg_reg_tmp;
+
 typedef union {
+	struct {
 	union {
 		uint32_t _32;
 		uint16_t _16;
 		uint8_t _8[2];
 	} gpr[8];
+	struct seg_reg s_reg[4];
+	uint32_t cr[4];
+	};
 
 	/* Do NOT change the order of the GPRs' definitions. 
 	 * They match the register encoding scheme used in i386 instruction format.
@@ -25,6 +36,16 @@ typedef union {
 
 	struct{
 		int32_t eax, ecx, edx, ebx, esp, ebp, esi, edi;
+		struct seg_reg ES,CS,SS,DS;
+		union{
+			struct {
+				uint32_t PE :1;
+				uint32_t useless:30;
+				uint32_t PG :1;
+			};
+			uint32_t val;
+		}CR0;
+		uint32_t CR1,CR2,CR3;
 		swaddr_t eip;
 		union {
 			struct {
@@ -49,21 +70,33 @@ typedef union {
 			};
 			uint32_t val;
 		} EFLAGS;
+		struct {
+			uint32_t base;
+			uint16_t lim;
+		}GDTR;
+		//uint16_t CS,DS,ES,SS;//SEGMENT
 	};
 } CPU_state;
 
 extern CPU_state cpu;
 
+int current_sreg;
+
 enum { R_EAX, R_ECX, R_EDX, R_EBX, R_ESP, R_EBP, R_ESI, R_EDI };
 enum { R_AX, R_CX, R_DX, R_BX, R_SP, R_BP, R_SI, R_DI };
 enum { R_AL, R_CL, R_DL, R_BL, R_AH, R_CH, R_DH, R_BH };
+enum { R_CS, R_DS, R_ES, R_SS };
 
 #define reg_l(index) (cpu.gpr[index]._32)
 #define reg_w(index) (cpu.gpr[index]._16)
 #define reg_b(index) (cpu.gpr[index & 0x3]._8[index >> 2])
+#define s_reg(index) (cpu.s_reg[index].selector)
+#define c_reg(index) (cpu.cr[index])
 
 extern const char* regsl[];
 extern const char* regsw[];
 extern const char* regsb[];
+extern const char* s_reg_str[];
+extern const char* c_reg_str[];
 
 #endif

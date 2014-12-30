@@ -15,7 +15,7 @@ CFILES  = $(shell find src/ -name "*.c")
 OBJS    = $(CFILES:.c=.o)
 
 # test files
-TESTFILE = testcase/c/add
+TESTFILE = testcase/c/min3
 C_TEST_FILE_LIST = $(shell find testcase/c/ -name "*.c")
 S_TEST_FILE_LIST = $(shell find testcase/asm/ -name "*.S")
 TEST_FILE_LIST = $(C_TEST_FILE_LIST:.c=) $(S_TEST_FILE_LIST:.S=)
@@ -31,7 +31,7 @@ $(TEST_FILE_LIST):
 
 #loader: $(TESTFILE)
 #	objcopy -S -O binary $(TESTFILE) loader
-LOADER_DIR = myloader
+LOADER_DIR = ~/NEMU/kernel
 loader:
 	cd $(LOADER_DIR)&&make
 	objcopy -S -O binary $(LOADER_DIR)/loader loader

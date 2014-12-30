@@ -14,5 +14,6 @@ make_helper(dopcf6);
 make_helper(dopcf7);
 make_helper(dopcfe);
 make_helper(dopcff);
+make_helper(dopc01);
 
 #endif

@@ -28,6 +28,8 @@ void restart() {
 	cpu.ebp = 0;
 	cpu.esp = 0x800000;
 	cpu.EFLAGS.val = 0x2;
+	cpu.CS.base = 0;
+	cpu.CS.lim = 0xffffffff;
 
 	init_dram();
 	reload();//重新载入断点
@@ -43,14 +45,15 @@ static void print_bin_instr(swaddr_t eip, int len) {
 }
 
 void cpu_exec(volatile uint32_t n) {
-	volatile uint32_t n_temp = n;
+//	volatile uint32_t n_temp = n;
 
 	setjmp(jbuf);
 	for(; n > 0; n --) {
 		swaddr_t eip_temp = cpu.eip;
 		int instr_len = exec(cpu.eip);
 		cpu.eip += instr_len;
-		if(n_temp != -1 || (enable_debug && !quiet)) {
+		//if(n_temp != -1 || (enable_debug && !quiet)) {
+		if((enable_debug && !quiet)) {
 			print_bin_instr(eip_temp, instr_len);
 			puts(assembly);
 		}

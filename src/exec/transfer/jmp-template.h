@@ -27,4 +27,14 @@ make_helper(concat(jmp_rm_,SUFFIX)) {
 		return 1+len;
 	}
 }
+
+make_helper(concat(ljmp_,SUFFIX)) {
+	DATA_TYPE_S tmp1 = instr_fetch( eip+1 , DATA_BYTE );
+	uint16_t tmp2 = instr_fetch( eip+5 , 2 );
+	cpu.eip = tmp1-3-DATA_BYTE;
+	cpu.CS.selector = tmp2;
+	print_asm("ljmp" " $0x%x,$0x%x",tmp2,tmp1);
+	return 1+DATA_BYTE+2;
+}
+
 #include "exec/template-end.h"

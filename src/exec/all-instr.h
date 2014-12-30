@@ -19,6 +19,7 @@
 #include "logic/and.h"
 #include "logic/xor.h"
 #include "logic/shift.h"
+#include "logic/setcc.h"
 
 #include "transfer/jcc.h"
 #include "transfer/jmp.h"
@@ -42,3 +43,6 @@
 
 #include "scti/movs.h"
 #include "scti/rep.h"
+#include "scti/stos.h"
+
+#include "sys_ins/lgdt.h"

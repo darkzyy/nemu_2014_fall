@@ -200,6 +200,7 @@ make_helper(dopcf6) {
 	ModR_M m;
 	m.val=instr_fetch(eip+1,1);
 	switch (m.opcode){
+		case 0:return test_i2rm_b(eip);break;
 		case 2:return not_b(eip);break;
 		case 3:return neg_b(eip);break;
 		case 4:return mul_rm2r_b(eip);break;
@@ -216,13 +217,25 @@ make_helper(dopcf7) {
 	ModR_M m;
 	m.val=instr_fetch(eip+1,1);
 	switch (m.opcode){
-		case 2:return neg_v(eip);break;
+		case 0:return test_i2rm_v(eip);break;
+		case 2:return not_v(eip);break;
 		case 3:return neg_v(eip);break;
 		case 4:return mul_rm2r_v(eip);break;
 		case 5:return imul_rm2r_v(eip);break;
 		case 6:return div_rm2r_v(eip);break;
 		case 7:return idiv_rm2r_v(eip);break;
 		default :{
+					 printf("dopcode error\n");
+					 assert(0);
+				 }
+	}
+}
+make_helper(dopc01) {
+	ModR_M m;
+	m.val=instr_fetch(eip+1,1);
+	switch (m.opcode){
+		case 2:return lgdt_v(eip);break;
+		default:{
 					 printf("dopcode error\n");
 					 assert(0);
 				 }

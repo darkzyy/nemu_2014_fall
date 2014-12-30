@@ -20,3 +20,6 @@ make_helper(jmp_rel_v) {
 make_helper(jmp_rm_v) {
 	return (suffix == 'l' ? jmp_rm_l(eip) : jmp_rm_w(eip));
 }
+make_helper(ljmp_v) {
+	return (suffix == 'l' ? ljmp_l(eip) : ljmp_w(eip));
+}

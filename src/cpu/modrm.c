@@ -4,6 +4,8 @@
 
 #include "nemu.h"
 
+extern int current_sreg;
+
 char ModR_M_asm[MODRM_ASM_BUF_SIZE];
 #define print_ModR_M_asm(...) \
 	assert(snprintf(ModR_M_asm, MODRM_ASM_BUF_SIZE, __VA_ARGS__) < MODRM_ASM_BUF_SIZE )
@@ -28,6 +30,7 @@ int read_ModR_M(swaddr_t eip, swaddr_t *addr) {
 		base_reg = s.base;
 		disp_offset = 2;
 		scale = s.ss;
+		current_sreg = 3;
 
 		if(s.index != R_ESP) { index_reg = s.index; }
 	}
@@ -35,11 +38,18 @@ int read_ModR_M(swaddr_t eip, swaddr_t *addr) {
 		/* no SIB */
 		base_reg = m.R_M;
 		disp_offset = 1;
+		current_sreg = 2;
 	}
 
 	if(m.mod == 0) {
-		if(base_reg == R_EBP) { base_reg = -1; }
-		else { disp_size = 0; }
+		if(base_reg == R_EBP) { 
+			//current_sreg = 1;
+			base_reg = -1;
+		}
+		else { 
+			//current_sreg = 3;
+			disp_size = 0; 
+		}
 	}
 	else if(m.mod == 1) { disp_size = 1; }
 

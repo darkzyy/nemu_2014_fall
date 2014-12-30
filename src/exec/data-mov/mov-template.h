@@ -83,4 +83,59 @@ make_helper(concat(mov_moffs2a_, SUFFIX)) {
 	return 5;
 }
 
+make_helper(concat(mov_c2r_,SUFFIX)) {
+	ModR_M m;
+	m.val = instr_fetch(eip+1,1);
+	reg_l(m.R_M)=c_reg(m.reg);
+	print_asm("mov %%%s,%%%s" , c_reg_str[m.reg], REG_NAME(m.R_M));
+	return 2;
+}
+
+make_helper(concat(mov_r2c_,SUFFIX)) {
+	ModR_M m;
+	m.val = instr_fetch(eip+1,1);
+	c_reg(m.reg)=reg_l(m.R_M);
+	print_asm("mov %%%s,%%%s" , REG_NAME(m.R_M), c_reg_str[m.reg]);
+	return 2;
+}
+
+make_helper(concat(mov_rm2sr_, SUFFIX)) {
+	ModR_M m;
+	m.val = instr_fetch(eip + 1, 1);
+	if(m.mod == 3) {
+		s_reg(m.reg) = reg_w(m.R_M);
+		cpu.s_reg[m.reg].base = 0;
+		cpu.s_reg[m.reg].lim = 0xffffffff;
+		print_asm("mov" str(SUFFIX) " %%%s,%%%s", REG_NAME(m.R_M), s_reg_str[m.reg]);
+		return 2;
+	}
+	else {
+		swaddr_t addr;
+		int len = read_ModR_M(eip + 1, &addr);
+		s_reg(m.reg) = MEM_R(addr);
+		cpu.s_reg[m.reg].base = 0;
+		cpu.s_reg[m.reg].lim = 0xffffffff;
+		print_asm("mov" str(SUFFIX) " %s,%%%s", ModR_M_asm, s_reg_str[m.reg]);
+		return len + 1;
+	}
+}
+
+make_helper(concat(mov_sr2rm_, SUFFIX)) {
+	ModR_M m;
+	m.val = instr_fetch(eip + 1, 1);
+	if(m.mod == 3) {
+		REG(m.R_M) = s_reg(m.reg);
+		print_asm("mov" str(SUFFIX) " %%%s,%%%s", s_reg_str[m.reg], REG_NAME(m.R_M));
+		return 2;
+	}
+	else {
+		swaddr_t addr;
+		int len = read_ModR_M(eip + 1, &addr);
+		MEM_W(addr, REG(m.reg));
+
+		print_asm("mov" str(SUFFIX) " %%%s,%s", s_reg_str[m.reg], ModR_M_asm);
+		return len + 1;
+	}
+}
+
 #include "exec/template-end.h"

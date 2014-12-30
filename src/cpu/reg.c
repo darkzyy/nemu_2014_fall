@@ -8,6 +8,8 @@ CPU_state cpu;
 const char *regsl[] = {"eax", "ecx", "edx", "ebx", "esp", "ebp", "esi", "edi"};
 const char *regsw[] = {"ax", "cx", "dx", "bx", "sp", "bp", "si", "di"};
 const char *regsb[] = {"al", "cl", "dl", "bl", "ah", "ch", "dh", "bh"};
+const char *s_reg_str[] = {"es", "cs", "ss", "ds"};
+const char *c_reg_str[] = {"cr0", "cr1", "cr2", "cr3"};
 
 void reg_test() {
 	srand(time(0));
