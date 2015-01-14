@@ -20,6 +20,8 @@ typedef struct breakpoint {
 
 void init_bp_pool();
 void add_bp(swaddr_t addr,int inc);
+void add_newb(swaddr_t addr);
+bool hit_newb();
 void add_wp(char *p);
 void free_bp(int NO);
 void reno();

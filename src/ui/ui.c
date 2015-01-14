@@ -137,6 +137,14 @@ static void cmd_w(char *p){
 
 }
 
+static void cmd_newb(char *p){
+	p = strtok(NULL," ");
+	assert(p);
+	swaddr_t addr;
+	sscanf(p,"%x",&addr);
+	add_newb(addr);
+}
+
 static void cmd_info_b(){
 	printb();
 }
@@ -235,15 +243,9 @@ void main_loop() {
 		else if(strcmp(p,"p")==0)	{cmd_p(p);}
 		else if(strcmp(p,"w")==0)	{cmd_w(p);}
 		else if(strcmp(p,"bt")==0)	{cmd_bt();}
-
-
-
-
-
-
+		else if(strcmp(p,"newb")==0)	{cmd_newb(p);}
 
 		/* TODO: Add more commands */
-
 		else { printf("Unknown command '%s'\n", p); }
 	}
 }

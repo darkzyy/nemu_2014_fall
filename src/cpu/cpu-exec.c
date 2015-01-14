@@ -45,7 +45,7 @@ static void print_bin_instr(swaddr_t eip, int len) {
 }
 
 void cpu_exec(volatile uint32_t n) {
-//	volatile uint32_t n_temp = n;
+	volatile uint32_t n_temp = n;
 
 	setjmp(jbuf);
 	for(; n > 0; n --) {
@@ -53,7 +53,7 @@ void cpu_exec(volatile uint32_t n) {
 		int instr_len = exec(cpu.eip);
 		cpu.eip += instr_len;
 		//if(n_temp != -1 || (enable_debug && !quiet)) {
-		if((enable_debug && !quiet)) {
+		if((enable_debug && !quiet && n_temp<11)) {
 			print_bin_instr(eip_temp, instr_len);
 			puts(assembly);
 		}
@@ -73,5 +73,7 @@ void cpu_exec(volatile uint32_t n) {
 			nemu_state=RUNNING;
 		}
 		else if(wp_change()) {return;}
+		if(hit_newb())
+		  return;
 	}
 }

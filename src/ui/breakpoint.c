@@ -33,31 +33,13 @@ swaddr_t find_bp(int a){
 	while(a!=1){
 		a--;
 		if(p->next!=NULL)
-			p=p->next;
+		  p=p->next;
 		else
-			printf("error input\n");
+		  printf("error input\n");
 	}
 	return p->addr;
 }
 void printb(){
-	/*printf("head:\n");
-	if(head!=NULL){
-		BP *p=head;
-		printf("%d	%p	%p %x %x\n",p->NO,p,p->next,p->addr,p->pre_inc);
-		while(p->next!=NULL){
-			p=p->next;
-			printf("%d	%p	%p %x %x\n",p->NO,p,p->next,p->addr,p->pre_inc);
-		}
-	}
-	printf("free:\n");
-	if(free_!=NULL){
-		BP *p=free_;
-		printf("%d	%p	%p %x %x\n",p->NO,p,p->next,p->addr,p->pre_inc);
-		while(p!=ftail){
-			p=p->next;
-			printf("%d	%p	%p %x %x\n",p->NO,p,p->next,p->addr,p->pre_inc);
-		}
-	}*/
 	int i=1;
 	if(head==NULL){
 		printf("bpbool=NULL \n");
@@ -65,27 +47,27 @@ void printb(){
 	}
 	BP *p=head;
 	if(p->type==0)
-		printf("%d:		addr:%x		inc:%x\n",i,p->addr,p->pre_inc);
+	  printf("%d:		addr:%x		inc:%x\n",i,p->addr,p->pre_inc);
 	else
-		printf("%d:		watchpoint:%s		pre_val:%d\n",i,p->exp,p->pre_val);
+	  printf("%d:		watchpoint:%s		pre_val:%d\n",i,p->exp,p->pre_val);
 	while(p!=tail){
 		p=p->next;
 		i++;
 		if(p->type==0)
-			printf("%d:		addr:%x		inc:%x\n",i,p->addr,p->pre_inc);
+		  printf("%d:		addr:%x		inc:%x\n",i,p->addr,p->pre_inc);
 		else
-			printf("%d:		watchpoint:%s		pre_val:%d\n",i,p->exp,p->pre_val);
+		  printf("%d:		watchpoint:%s		pre_val:%d\n",i,p->exp,p->pre_val);
 	}
 }
 
 int find_pre_inc(swaddr_t eip){
 	if(head->addr==eip)
-		return head->pre_inc;
+	  return head->pre_inc;
 	BP *p=head;
 	while(p!= tail){
 		p=p->next;
 		if(p->addr==eip)
-			return p->pre_inc;
+		  return p->pre_inc;
 	}
 	if(head==tail){
 		printf("eip error\n");
@@ -181,7 +163,7 @@ void free_bp(int NO){
 	if(p->NO!=NO){
 		while(p->next!=NULL){/*p有后继时*/
 			if(p->next->NO==NO)
-				break;
+			  break;
 			p=p->next;
 		}
 		if(p->next==NULL){/*所删除的NO不存在*/
@@ -205,7 +187,7 @@ void free_bp(int NO){
 			}
 		}
 		else
-			p->next=NULL;
+		  p->next=NULL;
 		tail=p;
 		ftail->next=NULL;
 		reno();			/*重置free_断点序号*/
@@ -267,13 +249,14 @@ bool wp_change(){
 }
 void reload(){
 	if(head==NULL)
-		return;
-	if(head->type==0)
-		//printf("reloading\n");
+	  return;
+	if(head->type==0){
+	  //printf("reloading\n");
 		head->pre_inc=swaddr_read(head->addr,1);
 		swaddr_write(head->addr,1,0xcc);
+	}
 	if(head->next==NULL)
-		return;
+	  return;
 	else{
 		BP *p=head;
 		while(p->next!=NULL){
@@ -288,8 +271,44 @@ void reload(){
 	}
 }
 
+void add_newb(swaddr_t addr){
+	if(free_->next==NULL){
+		printf("free_已用尽\n");
+		return;	
+	};
+	if(head==NULL){
+		head =free_;
+		tail=free_;
+	}
+	else{
+		tail->next = free_;
+		tail=tail->next;
+	}
+	free_= free_->next;
+	tail->addr = addr;
+	tail->type = 2;
+	tail->next = NULL;
+}
+bool hit_newb(){
+	if(head==NULL)
+	  return 0;
+	if(head->type ==2&&cpu.eip==head->addr){
+		printf("newb hit!	addr:0x%x\n",head->addr);
+		return 1;
+	}
+	BP *p=head;
+	while(p!=tail){
+		p=p->next;
+		if(p->type ==2&&cpu.eip==p->addr){
+			printf("newb hit!	addr:0x%x\n",p->addr);
+			return 1;
+		}
+	}
+	return 0;
+}
 
 
 
 
-/* TODO: Implement the function of breakpoint */
+
+	/* TODO: Implement the function of breakpoint */
