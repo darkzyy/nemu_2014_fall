@@ -9,10 +9,12 @@ void init_bp_pool();
 void init_regex();
 void init_signal();
 void reg_test();
-extern void init_cache1();
 
 int enable_debug = false;
 int quiet = false;
+
+long long hit1=0,miss1=0,sub1=0;
+long long hit2=0,miss2=0,sub2=0;
 
 static void process_args(int argc, char *argv[]) {
 	int opt;
@@ -41,7 +43,6 @@ int main(int argc, char *argv[]) {
 	/* Perform some global initialization */
 	init_regex();
 	init_signal();
-	init_cache1();
 	load_table();
 	init_bp_pool();
 
@@ -50,6 +51,8 @@ int main(int argc, char *argv[]) {
 	reg_test();
 
 	main_loop();
+	printf("L1:hit:%lld,miss:%lld,sub:%lld\n",hit1,miss1,sub1);
+	printf("L2:hit:%lld,miss:%lld,sub:%lld\n",hit2,miss2,sub2);
 
 	return 0;
 }

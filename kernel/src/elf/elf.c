@@ -41,9 +41,6 @@ uint32_t loader() {
 			int j;
 			/* TODO: read the content of the segment from the ELF file 
 			 * to the memory region [VirtAddr, VirtAddr + FileSiz)
-			for(j=0;j<ph[i].p_filesz;j++){
-				temp[j]=src[j];
-			}
 			 */
 			memcpy(temp,src,ph[i].p_filesz);
 			j=ph[i].p_filesz;

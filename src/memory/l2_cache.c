@@ -39,6 +39,8 @@ block cache2[nr_group][ways];
 extern uint32_t dram_read(hwaddr_t addr,size_t len);
 extern void dram_write(hwaddr_t addr,size_t len,uint32_t data);
 
+extern long long hit2,miss2,sub2;
+
 void init_cache2(){
 	int i,j;
 	for(i=0;i<nr_group;i++){
@@ -48,18 +50,15 @@ void init_cache2(){
 		}
 	}
 }
+
 void cache2_read_2(hwaddr_t addr,void *tmp){
-	//	printf("read one time,addr:0x%x\n",addr);
-	//	fflush(stdout);
 	test(addr<hw_mem_size,"addr=%x\n",addr);
 	cache2_addr temp;
 	temp.addr=addr & ~block_mask;
-	//uint32_t offset=addr & block_mask;
 	int i,j;
 	for(i=0;i<ways;i++){
 		if(cache2[temp.group][i].flag.v && (cache2[temp.group][i].flag.tag==(addr>>(block_width+group_width)))){
-			//	printf("hit one time\n");//
-			//	fflush(stdout);
+			hit2++;
 			memcpy(tmp,cache2[temp.group][i].a,block_len);
 			break;
 		}
@@ -72,6 +71,7 @@ void cache2_read_2(hwaddr_t addr,void *tmp){
 				}
 				cache2[temp.group][i].flag.v=1;
 				cache2[temp.group][i].flag.tag=(addr>>(block_width+group_width));
+				miss2++;
 				memcpy(tmp,cache2[temp.group][i].a,block_len);
 				break;
 			}
@@ -89,6 +89,7 @@ void cache2_read_2(hwaddr_t addr,void *tmp){
 			}
 			cache2[temp.group][i].flag.v=1;
 			cache2[temp.group][i].flag.tag=(addr>>(block_width+group_width));
+			sub2++;
 			memcpy(tmp,cache2[temp.group][i].a,block_len);
 		}
 	}
@@ -98,11 +99,9 @@ void cache2_write_2(hwaddr_t addr,void *tmp,uint8_t *mask){
 	test(addr<hw_mem_size,"addr=%x\n",addr);
 	cache2_addr temp;
 	temp.addr=addr & ~block_mask;
-	//uint32_t offset=addr & block_mask;
 	int i,j;
 	for(i=0;i<ways;i++){
 		if(cache2[temp.group][i].flag.v && (cache2[temp.group][i].flag.tag==(addr>>(block_width+group_width)))){
-			//assert(0);
 			memcpy_with_mask(cache2[temp.group][i].a,tmp,block_len,mask);
 			cache2[temp.group][i].flag.db=1;
 			break;
@@ -146,10 +145,6 @@ uint32_t cache2_read(hwaddr_t addr,size_t len) {
 	uint8_t tmp[block_len*2];
 	cache2_read_2(addr,tmp);
 	if( (addr^(addr +len - 1)) & ~(block_mask) ){
-		//	printf("cross one time\n");//
-		//	fflush(stdout);
-		//assert(0);
-		//return dram_read(addr,len);
 		cache2_read_2(addr+block_len,tmp+block_len);
 	}
 	return *(uint32_t *)(tmp+offset) & (~0u >> ((4 - len)<<3));
@@ -157,7 +152,6 @@ uint32_t cache2_read(hwaddr_t addr,size_t len) {
 
 void cache2_write(hwaddr_t addr,size_t len,uint32_t data){
 	assert(len==1||len==2||len==4);
-	//dram_write(addr,len,data);
 	uint32_t offset = addr & block_mask;
 	uint8_t tmp[2 * block_len];
 	uint8_t mask[2 * block_len];
@@ -169,8 +163,6 @@ void cache2_write(hwaddr_t addr,size_t len,uint32_t data){
 	cache2_write_2(addr,tmp,mask);
 
 	if( (addr^(addr +len-1)) & ~(block_mask) ){
-		//	printf("write cross one time\n");//
-		//	fflush(stdout);
 		cache2_write_2(addr+block_len,tmp+block_len,mask+block_len);
 	}
 }

@@ -91,9 +91,12 @@ make_helper(concat(mov_c2r_,SUFFIX)) {
 	return 2;
 }
 
+extern void init_tlb();
 make_helper(concat(mov_r2c_,SUFFIX)) {
 	ModR_M m;
 	m.val = instr_fetch(eip+1,1);
+	if(m.reg==3)
+	  init_tlb();
 	c_reg(m.reg)=reg_l(m.R_M);
 	print_asm("mov %%%s,%%%s" , REG_NAME(m.R_M), c_reg_str[m.reg]);
 	return 2;

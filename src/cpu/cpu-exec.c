@@ -10,6 +10,9 @@ int exec(swaddr_t);
 int exec2(swaddr_t);
 void load_prog();
 void init_dram();
+extern void init_cache1();
+extern void init_cache2();
+extern void init_tlb();
 
 char assembly[40];
 jmp_buf jbuf;	/* Make it easy to perform exception handling */
@@ -30,7 +33,12 @@ void restart() {
 	cpu.EFLAGS.val = 0x2;
 	cpu.CS.base = 0;
 	cpu.CS.lim = 0xffffffff;
+	cpu.CR0.PG = 0;
+	cpu.CR0.PE = 0;
 
+	init_cache1();
+	init_cache2();
+	init_tlb();
 	init_dram();
 	reload();//重新载入断点
 }
@@ -45,7 +53,7 @@ static void print_bin_instr(swaddr_t eip, int len) {
 }
 
 void cpu_exec(volatile uint32_t n) {
-	volatile uint32_t n_temp = n;
+	//volatile uint32_t n_temp = n;
 
 	setjmp(jbuf);
 	for(; n > 0; n --) {
@@ -53,7 +61,8 @@ void cpu_exec(volatile uint32_t n) {
 		int instr_len = exec(cpu.eip);
 		cpu.eip += instr_len;
 		//if(n_temp != -1 || (enable_debug && !quiet)) {
-		if((enable_debug && !quiet && n_temp<11)) {
+		//if((enable_debug && !quiet && n_temp<11)) {
+		if((enable_debug && !quiet)) {
 			print_bin_instr(eip_temp, instr_len);
 			puts(assembly);
 		}
