@@ -102,6 +102,7 @@ make_helper(concat(mov_r2c_,SUFFIX)) {
 	return 2;
 }
 
+extern int sreg_dirty[4];
 make_helper(concat(mov_rm2sr_, SUFFIX)) {
 	ModR_M m;
 	m.val = instr_fetch(eip + 1, 1);
@@ -109,6 +110,7 @@ make_helper(concat(mov_rm2sr_, SUFFIX)) {
 		s_reg(m.reg) = reg_w(m.R_M);
 		cpu.s_reg[m.reg].base = 0;
 		cpu.s_reg[m.reg].lim = 0xffffffff;
+		sreg_dirty[m.reg] = 1;
 		print_asm("mov" str(SUFFIX) " %%%s,%%%s", REG_NAME(m.R_M), s_reg_str[m.reg]);
 		return 2;
 	}
@@ -118,6 +120,7 @@ make_helper(concat(mov_rm2sr_, SUFFIX)) {
 		s_reg(m.reg) = MEM_R(addr);
 		cpu.s_reg[m.reg].base = 0;
 		cpu.s_reg[m.reg].lim = 0xffffffff;
+		sreg_dirty[m.reg] = 1;
 		print_asm("mov" str(SUFFIX) " %s,%%%s", ModR_M_asm, s_reg_str[m.reg]);
 		return len + 1;
 	}

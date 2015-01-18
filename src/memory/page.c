@@ -30,14 +30,6 @@ hwaddr_t page_translate(lnaddr_t addr){
 #define offset_width 12
 #define NR_TLB 64
 
-/*typedef union{
-	uint32_t addr;
-	struct {
-		uint32_t offset :offset_width;
-		uint32_t tag    :tag_width;
-	};
-}laddr;
-*/
 typedef struct{
 	union{
 		struct{
@@ -57,11 +49,16 @@ void init_tlb(){
 	  TLB[i].v = 0;
 }
 
+extern long long hit3;
+extern long long miss3;
+extern long long sub3;
+
 hwaddr_t tlb(lnaddr_t addr){
 	int i;
 	uint32_t offset = addr&mask_offset;
 	for(i=0;i<NR_TLB;i++){
 		if( TLB[i].v==1 && (TLB[i].tag==(addr&~mask_offset)>>offset_width)){
+		  hit3++;
 		  return (TLB[i].pframe_base+offset);
 		}
 	}
@@ -78,6 +75,7 @@ hwaddr_t tlb(lnaddr_t addr){
 			TLB[i].tag = (addr&~mask_offset)>>offset_width;
 			TLB[i].pframe_base =pframe_base_addr; 
 			TLB[i].v = 1;
+			miss3++;
 			return pframe_base_addr+offset;
 		}
 	}
@@ -87,6 +85,7 @@ hwaddr_t tlb(lnaddr_t addr){
 	TLB[i].tag = (addr&~mask_offset)>>offset_width;
 	TLB[i].pframe_base =pframe_base_addr; 
 	TLB[i].v = 1;
+	sub3++;
 	return pframe_base_addr+offset;
 }
 
