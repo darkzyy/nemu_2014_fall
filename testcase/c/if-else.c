@@ -21,8 +21,5 @@ int main() {
 	for(i = 0; i < NR_DATA; i ++) {
 		nemu_assert(if_else(test_data[i]) == ans[ans_idx ++]);
 	}
-
-	HIT_GOOD_TRAP;
-
 	return 0;
 }

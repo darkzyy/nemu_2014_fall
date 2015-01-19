@@ -318,9 +318,6 @@ int main() {
 			nemu_assert(c[i][j] == ans[i][j]);
 		}
 	}
-
-	HIT_GOOD_TRAP;
-
 	return 0;
 
 }

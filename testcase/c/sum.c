@@ -8,7 +8,5 @@ int main() {
 	}
 
 	nemu_assert(sum == 5050);
-	HIT_GOOD_TRAP;
-
 	return 0;
 }

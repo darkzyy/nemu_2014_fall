@@ -9,7 +9,5 @@ int main() {
 		fib[i] = fib[i - 1] + fib[i - 2];
 		nemu_assert(fib[i] == ans[i]);
 	}
-
-	HIT_GOOD_TRAP;
 	return 0;
 }

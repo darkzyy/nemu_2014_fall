@@ -11,7 +11,7 @@
 #define block_len (1<<block_width)
 #define nr_group (1<<group_width)
 #define block_mask (block_len-1)
-#define ways (1<<3)
+#define ways (1<<(16-block_width-group_width))
 
 typedef union {
 	struct {
@@ -80,7 +80,7 @@ void cache1_read_2(hwaddr_t addr,void *tmp){
 		}
 		if(i==ways){
 			srand((unsigned) time(NULL));
-			i=rand()%8;
+			i=rand()%ways;
 			for(j=0;j<block_len;j++){
 				cache1[temp.group][i].a[j]=cache2_read(temp.addr+j,1);
 			}

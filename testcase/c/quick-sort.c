@@ -40,8 +40,5 @@ int main() {
 	for(i = 0; i < N; i ++) {
 		nemu_assert(a[i] == i);
 	}
-
-	HIT_GOOD_TRAP;
-
 	return 0;
 }

@@ -52,9 +52,9 @@ int main(int argc, char *argv[]) {
 	reg_test();
 
 	main_loop();
-	printf("L1:hit:%lld,miss:%lld,sub:%lld\n",hit1,miss1,sub1);
-	printf("L2:hit:%lld,miss:%lld,sub:%lld\n",hit2,miss2,sub2);
-	printf("TLB:hit:%lld,miss:%lld,sub:%lld\n",hit3,miss3,sub3);
+	printf("L1:hit:%lld,miss:%lld,sub:%lld,hitrate:%f,time:%lld\n",hit1,miss1,sub1,(float)hit1/(hit1+miss1+sub1),hit1+100*(sub1+miss1));
+	printf("L2:hit:%lld,miss:%lld,sub:%lld,hitrate:%f,time:%lld\n",hit2,miss2,sub2,(float)hit2/(hit2+miss2+sub2),hit2+100*(sub2+miss2));
+	printf("TLB:hit:%lld,miss:%lld,sub:%lld,hitrate:%f\n",hit3,miss3,sub3,(float)hit3/(hit3+miss3+sub3));
 
 	return 0;
 }

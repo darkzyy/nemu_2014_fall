@@ -29,8 +29,5 @@ int main() {
 	for(n = 4; n <= 1000; n += 2) {
 		nemu_assert(gotbaha(n) == 1);
 	}
-
-	HIT_GOOD_TRAP;
-
 	return 0;
 }

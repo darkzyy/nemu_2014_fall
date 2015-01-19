@@ -26,6 +26,7 @@ void flag_of(int32_t op1,int32_t op2,char a,int data_byte) {
 		assert(0);
 	}
 }
+
 void flag_cf(uint32_t op1,uint32_t op2,char a,int data_byte){
 	uint32_t mask_cf=1;
 	if(data_byte!=4){
@@ -51,6 +52,7 @@ void flag_cf(uint32_t op1,uint32_t op2,char a,int data_byte){
 		assert(0);
 	}
 }
+
 void flag_zf(int32_t temp,int data_byte){
 	uint32_t mask_zf=1;
 	if(data_byte!=4){
@@ -60,6 +62,7 @@ void flag_zf(int32_t temp,int data_byte){
 	else mask_zf=0xffffffff;
 	cpu.EFLAGS.ZF=!(temp&mask_zf);
 }
+
 void flag_af(int32_t op1,int32_t op2,char a) {
 	if(a=='-'){
 		if((mask_af&op1)<(mask_af&op2))
@@ -91,6 +94,6 @@ void flag_pf(int32_t temp) {
 	//printf("PF:%d		tmp2:%d\n",cpu.EFLAGS.PF,tmp2);
 }
 
-void flag_sf(int32_t temp,int data_byte) {
+inline void flag_sf(int32_t temp,int data_byte) {
 	cpu.EFLAGS.SF=(temp>>((8*data_byte)-1))&mask_lsb;
 }
