@@ -39,11 +39,11 @@ void print_mem(){
     for(rc = rec_head; rc != NULL; rc = rc->hh.next){
         int i;
         uint32_t *arr = (uint32_t *) &(rc->key);
-        if(rc->count > 50){
-            for(i = 0; i < block_len/4; i+=4){
-                printf("0x%x ",arr[i]);
+        if(rc->count > 0){
+            for(i = 0; i < block_len; i+=4){
+                printf("0x%x, ",arr[i]);
             }
-            printf("\n");
+            printf("\t\t count: %llu\n",rc->count);
         }
     }
 }
