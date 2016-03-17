@@ -139,13 +139,17 @@ void cache2_write_2(hwaddr_t addr,void *tmp,uint8_t *mask){
 	}
 }
 
+extern void add_bl(void *mem);
+
 uint32_t cache2_read(hwaddr_t addr,size_t len) {
 	assert(len==1||len==2||len==4);
 	uint32_t offset = addr & block_mask;//块内偏移量
 	uint8_t tmp[block_len*2];
 	cache2_read_2(addr,tmp);
+    add_bl((void *) tmp);
 	if( (addr^(addr +len - 1)) & ~(block_mask) ){
 		cache2_read_2(addr+block_len,tmp+block_len);
+        add_bl((void *) tmp);
 	}
 	return *(uint32_t *)(tmp+offset) & (~0u >> ((4 - len)<<3));
 }
@@ -158,11 +162,13 @@ void cache2_write(hwaddr_t addr,size_t len,uint32_t data){
 	memset(mask, 0, 2*block_len);
 
 	*(uint32_t *)(tmp+offset) = data;
+    add_bl((void *) tmp);
 	memset(mask+offset,1,len);
 
 	cache2_write_2(addr,tmp,mask);
 
 	if( (addr^(addr +len-1)) & ~(block_mask) ){
+        add_bl((void *) tmp);
 		cache2_write_2(addr+block_len,tmp+block_len,mask+block_len);
 	}
 }
